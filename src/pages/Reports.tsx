@@ -8,9 +8,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import DashboardLayout from "@/components/layout/DashboardLayout"
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { useAuth } from "@/hooks/useAuth"
 import { useDashboardStats } from "@/hooks/useDashboardData"
+import { useAnalyticsDashboard } from "@/hooks/useAnalytics"
+import { AppointmentTrendsChart, RevenueTrendsChart, PatientFlowChart, AppointmentTypeChart } from "@/components/analytics/AnalyticsCharts"
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
 
 // Mock data for reports
@@ -86,6 +87,7 @@ const reportTemplates = [
 export default function Reports() {
   const { currentBranch } = useAuth()
   const { data: stats } = useDashboardStats()
+  const analytics = useAnalyticsDashboard()
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date())
@@ -213,110 +215,31 @@ export default function Reports() {
               </Card>
             </div>
 
-            {/* Charts */}
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Patient Flow</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={patientFlowData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Area type="monotone" dataKey="new" stackId="1" stroke="#8884d8" fill="#8884d8" />
-                      <Area type="monotone" dataKey="returning" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Appointment Types</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsPieChart>
-                      <Pie
-                        data={appointmentTypeData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {appointmentTypeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+            {/* Analytics Charts */}
+            <div className="grid gap-6">
+              <AppointmentTrendsChart 
+                data={analytics.appointments.data || []} 
+                isLoading={analytics.appointments.isLoading}
+              />
+              
+              <div className="grid gap-6 md:grid-cols-2">
+                <PatientFlowChart 
+                  data={analytics.patientFlow.data || []} 
+                  isLoading={analytics.patientFlow.isLoading}
+                />
+                <AppointmentTypeChart 
+                  data={analytics.appointmentTypes.data || []} 
+                  isLoading={analytics.appointmentTypes.isLoading}
+                />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="financial" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Revenue by Month</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={revenueData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="revenue" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Average Revenue per Patient</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={revenueData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="avgPerPatient" stroke="#82ca9d" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
+            <RevenueTrendsChart 
+              data={analytics.revenue.data || []} 
+              isLoading={analytics.revenue.isLoading}
+            />
           </TabsContent>
 
           <TabsContent value="patients" className="space-y-6">
@@ -330,21 +253,31 @@ export default function Reports() {
                     <TableRow>
                       <TableHead>Staff Member</TableHead>
                       <TableHead>Appointments</TableHead>
-                      <TableHead>Satisfaction</TableHead>
+                      <TableHead>Completion Rate</TableHead>
                       <TableHead>Revenue</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {staffPerformanceData.map((staff, index) => (
+                    {analytics.staffPerformance.data?.map((staff, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-medium">{staff.name}</TableCell>
-                        <TableCell>{staff.appointments}</TableCell>
+                        <TableCell className="font-medium">{staff.staff_name}</TableCell>
+                        <TableCell>{staff.total_appointments}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{staff.satisfaction}/5.0</Badge>
+                          <Badge variant="secondary">
+                            {staff.total_appointments > 0 
+                              ? Math.round((staff.completed_appointments / staff.total_appointments) * 100)
+                              : 0}%
+                          </Badge>
                         </TableCell>
-                        <TableCell>${staff.revenue.toLocaleString()}</TableCell>
+                        <TableCell>${Number(staff.revenue_generated).toLocaleString()}</TableCell>
                       </TableRow>
-                    ))}
+                    )) || (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground">
+                          {analytics.staffPerformance.isLoading ? 'Loading...' : 'No staff performance data available'}
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
