@@ -261,3 +261,40 @@ export function AppointmentTypeChart({ data, isLoading }: AppointmentTypeChartPr
     </Card>
   );
 }
+
+// Generic analytics chart component
+interface AnalyticsChartsProps {
+  data: any[];
+  type: 'appointments' | 'revenue' | 'patients' | 'queue';
+  showComparison?: boolean;
+}
+
+export function AnalyticsCharts({ data, type, showComparison = false }: AnalyticsChartsProps) {
+  if (!data || data.length === 0) {
+    return <Skeleton className="h-[400px] w-full" />;
+  }
+
+  switch (type) {
+    case 'appointments':
+      return <AppointmentTrendsChart data={data} />;
+    case 'revenue':
+      return <RevenueTrendsChart data={data} />;
+    case 'patients':
+      return <PatientFlowChart data={data} />;
+    case 'queue':
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Queue Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+              Queue performance charts coming soon
+            </div>
+          </CardContent>
+        </Card>
+      );
+    default:
+      return <div>Chart type not supported</div>;
+  }
+}
