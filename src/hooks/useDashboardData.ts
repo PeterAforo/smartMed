@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { format, startOfDay, endOfDay } from 'date-fns';
@@ -169,5 +169,32 @@ export function useActiveAlerts() {
     },
     enabled: !!tenant && !!currentBranch,
     refetchInterval: 15000, // Refresh every 15 seconds
+  });
+}
+
+export function useTakeActionOnInsight() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (insightId: string) => {
+      const { data, error } = await supabase
+        .from('ai_insights')
+        .update({
+          action_taken: true,
+          action_taken_by: user?.id,
+          action_taken_at: new Date().toISOString()
+        })
+        .eq('id', insightId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch AI insights
+      queryClient.invalidateQueries({ queryKey: ['ai-insights'] });
+    }
   });
 }

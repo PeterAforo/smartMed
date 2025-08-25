@@ -2,7 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAIInsights } from "@/hooks/useDashboardData";
+import { useAIInsights, useTakeActionOnInsight } from "@/hooks/useDashboardData";
+import { toast } from "sonner";
 import { 
   Brain, 
   TrendingUp, 
@@ -48,6 +49,16 @@ function getPriorityColor(priority: string) {
 
 export default function AIInsights() {
   const { data: insights, isLoading, error } = useAIInsights();
+  const takeActionMutation = useTakeActionOnInsight();
+
+  const handleTakeAction = async (insightId: string, title: string) => {
+    try {
+      await takeActionMutation.mutateAsync(insightId);
+      toast.success(`Action taken on: ${title}`);
+    } catch (error) {
+      toast.error('Failed to take action. Please try again.');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -200,8 +211,14 @@ export default function AIInsights() {
                   </div>
                   
                   {insight.is_actionable && !insight.action_taken && (
-                    <Button variant="outline" size="sm" className="text-xs">
-                      Take Action
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs"
+                      onClick={() => handleTakeAction(insight.id, insight.title)}
+                      disabled={takeActionMutation.isPending}
+                    >
+                      {takeActionMutation.isPending ? 'Taking Action...' : 'Take Action'}
                     </Button>
                   )}
                 </div>
