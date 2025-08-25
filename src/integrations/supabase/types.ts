@@ -230,72 +230,315 @@ export type Database = {
           },
         ]
       }
+      appointment_queue: {
+        Row: {
+          actual_start_time: string | null
+          appointment_id: string
+          branch_id: string
+          check_in_time: string | null
+          created_at: string
+          estimated_start_time: string | null
+          id: string
+          queue_date: string
+          queue_position: number
+          status: string
+          tenant_id: string
+          updated_at: string
+          wait_time_minutes: number | null
+        }
+        Insert: {
+          actual_start_time?: string | null
+          appointment_id: string
+          branch_id: string
+          check_in_time?: string | null
+          created_at?: string
+          estimated_start_time?: string | null
+          id?: string
+          queue_date: string
+          queue_position: number
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          wait_time_minutes?: number | null
+        }
+        Update: {
+          actual_start_time?: string | null
+          appointment_id?: string
+          branch_id?: string
+          check_in_time?: string | null
+          created_at?: string
+          estimated_start_time?: string | null
+          id?: string
+          queue_date?: string
+          queue_position?: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          wait_time_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_queue_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_reminders: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          delivery_status: string | null
+          error_message: string | null
+          id: string
+          message_content: string | null
+          reminder_time: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          delivery_status?: string | null
+          error_message?: string | null
+          id?: string
+          message_content?: string | null
+          reminder_time: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          delivery_status?: string | null
+          error_message?: string | null
+          id?: string
+          message_content?: string | null
+          reminder_time?: string
+          reminder_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_series: {
+        Row: {
+          appointments_created: number
+          branch_id: string
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          id: string
+          patient_id: string
+          recurrence_interval: number
+          recurrence_pattern: string
+          series_name: string
+          start_date: string
+          status: string
+          template_id: string | null
+          tenant_id: string
+          total_appointments: number | null
+          updated_at: string
+        }
+        Insert: {
+          appointments_created?: number
+          branch_id: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          patient_id: string
+          recurrence_interval?: number
+          recurrence_pattern: string
+          series_name: string
+          start_date: string
+          status?: string
+          template_id?: string | null
+          tenant_id: string
+          total_appointments?: number | null
+          updated_at?: string
+        }
+        Update: {
+          appointments_created?: number
+          branch_id?: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          patient_id?: string
+          recurrence_interval?: number
+          recurrence_pattern?: string
+          series_name?: string
+          start_date?: string
+          status?: string
+          template_id?: string | null
+          tenant_id?: string
+          total_appointments?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_series_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_templates: {
+        Row: {
+          appointment_type: string
+          branch_id: string
+          color_code: string | null
+          created_at: string
+          created_by: string | null
+          default_instructions: string | null
+          description: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          template_name: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_type: string
+          branch_id: string
+          color_code?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_instructions?: string | null
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          template_name: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_type?: string
+          branch_id?: string
+          color_code?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_instructions?: string | null
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          template_name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
+          actual_start_time: string | null
           appointment_date: string
           appointment_time: string
           appointment_type: string
           billing_amount: number | null
           branch_id: string
+          check_in_time: string | null
           chief_complaint: string | null
           created_at: string
           created_by: string | null
           diagnosis: Json | null
           duration_minutes: number | null
+          estimated_start_time: string | null
           follow_up_date: string | null
           follow_up_required: boolean | null
           id: string
           insurance_claim_id: string | null
           notes: string | null
           patient_id: string
+          reminder_preferences: Json | null
+          series_id: string | null
           staff_id: string | null
           status: string
+          template_id: string | null
           tenant_id: string
           treatment_plan: string | null
           updated_at: string
         }
         Insert: {
+          actual_start_time?: string | null
           appointment_date: string
           appointment_time: string
           appointment_type?: string
           billing_amount?: number | null
           branch_id: string
+          check_in_time?: string | null
           chief_complaint?: string | null
           created_at?: string
           created_by?: string | null
           diagnosis?: Json | null
           duration_minutes?: number | null
+          estimated_start_time?: string | null
           follow_up_date?: string | null
           follow_up_required?: boolean | null
           id?: string
           insurance_claim_id?: string | null
           notes?: string | null
           patient_id: string
+          reminder_preferences?: Json | null
+          series_id?: string | null
           staff_id?: string | null
           status?: string
+          template_id?: string | null
           tenant_id: string
           treatment_plan?: string | null
           updated_at?: string
         }
         Update: {
+          actual_start_time?: string | null
           appointment_date?: string
           appointment_time?: string
           appointment_type?: string
           billing_amount?: number | null
           branch_id?: string
+          check_in_time?: string | null
           chief_complaint?: string | null
           created_at?: string
           created_by?: string | null
           diagnosis?: Json | null
           duration_minutes?: number | null
+          estimated_start_time?: string | null
           follow_up_date?: string | null
           follow_up_required?: boolean | null
           id?: string
           insurance_claim_id?: string | null
           notes?: string | null
           patient_id?: string
+          reminder_preferences?: Json | null
+          series_id?: string | null
           staff_id?: string | null
           status?: string
+          template_id?: string | null
           tenant_id?: string
           treatment_plan?: string | null
           updated_at?: string
@@ -316,10 +559,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_series"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "appointments_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_templates"
             referencedColumns: ["id"]
           },
           {
@@ -1230,6 +1487,7 @@ export type Database = {
           medical_history: Json | null
           patient_number: string
           phone: string | null
+          reminder_preferences: Json | null
           status: string
           tenant_id: string
           updated_at: string
@@ -1253,6 +1511,7 @@ export type Database = {
           medical_history?: Json | null
           patient_number: string
           phone?: string | null
+          reminder_preferences?: Json | null
           status?: string
           tenant_id: string
           updated_at?: string
@@ -1276,6 +1535,7 @@ export type Database = {
           medical_history?: Json | null
           patient_number?: string
           phone?: string | null
+          reminder_preferences?: Json | null
           status?: string
           tenant_id?: string
           updated_at?: string
@@ -1549,6 +1809,68 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_bookings: {
+        Row: {
+          appointment_id: string | null
+          booking_date: string
+          branch_id: string
+          created_at: string
+          created_by: string | null
+          end_time: string
+          equipment_required: Json | null
+          id: string
+          notes: string | null
+          room_name: string
+          room_type: string | null
+          start_time: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          booking_date: string
+          branch_id: string
+          created_at?: string
+          created_by?: string | null
+          end_time: string
+          equipment_required?: Json | null
+          id?: string
+          notes?: string | null
+          room_name: string
+          room_type?: string | null
+          start_time: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          booking_date?: string
+          branch_id?: string
+          created_at?: string
+          created_by?: string | null
+          end_time?: string
+          equipment_required?: Json | null
+          id?: string
+          notes?: string | null
+          room_name?: string
+          room_type?: string | null
+          start_time?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_bookings_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
             referencedColumns: ["id"]
           },
         ]
