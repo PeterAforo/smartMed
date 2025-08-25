@@ -74,39 +74,45 @@ export function DashboardAnalyticsSection() {
     isLoading 
   } = useAnalyticsDashboard();
 
+  // Add null checks to prevent undefined data access
+  const safeAppointments = appointments || { data: [] };
+  const safeRevenue = revenue || { data: [] };
+  const safePatientFlow = patientFlow || { data: [] };
+  const safeQueuePerformance = queuePerformance || { data: [] };
+
   const quickMetrics = [
     {
       title: 'Daily Appointments',
-      value: appointments.data?.[0]?.completed_appointments || 0,
+      value: safeAppointments.data?.[0]?.completed_appointments || 0,
       change: { value: 8.2, positive: true },
-      data: appointments.data || [],
+      data: safeAppointments.data || [],
       dataKey: 'completed_appointments',
       icon: Calendar,
       onClick: () => navigate('/appointments')
     },
     {
       title: 'Revenue Today',
-      value: `$${(revenue.data?.[0]?.total_revenue || 0).toLocaleString()}`,
+      value: `$${(safeRevenue.data?.[0]?.total_revenue || 0).toLocaleString()}`,
       change: { value: 12.5, positive: true },
-      data: revenue.data || [],
+      data: safeRevenue.data || [],
       dataKey: 'total_revenue',
       icon: DollarSign,
       onClick: () => navigate('/reports?tab=revenue')
     },
     {
       title: 'New Patients',
-      value: patientFlow.data?.[0]?.new_patients || 0,
+      value: safePatientFlow.data?.[0]?.new_patients || 0,
       change: { value: 5.1, positive: true },
-      data: patientFlow.data || [],
+      data: safePatientFlow.data || [],
       dataKey: 'new_patients',  
       icon: Users,
       onClick: () => navigate('/patients')
     },
     {
       title: 'Queue Performance',
-      value: `${Math.round((queuePerformance.data?.[0]?.avg_wait_time || 0) / 60)}min`,
+      value: `${Math.round((safeQueuePerformance.data?.[0]?.avg_wait_time || 0) / 60)}min`,
       change: { value: 2.3, positive: false },
-      data: queuePerformance.data || [],
+      data: safeQueuePerformance.data || [],
       dataKey: 'avg_wait_time',
       icon: Activity,
       onClick: () => navigate('/reports?tab=queue')
