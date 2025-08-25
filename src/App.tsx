@@ -7,6 +7,10 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Patients from "./pages/Patients";
+import Appointments from "./pages/Appointments";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,14 +56,46 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/patients" 
+              element={
+                <ProtectedRoute>
+                  <Patients />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/appointments" 
+              element={
+                <ProtectedRoute>
+                  <Appointments />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reports" 
+              element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } 
+            />
             {/* Placeholder routes for all SmartMed modules */}
             {[
               'registration', 'checkin', 'inpatient', 'ward', 'doctor', 'nurse',
               'lab', 'inventory', 'accounts', 'cashier', 'insurance', 'claims',
               'pharmacy', 'imaging', 'radiology', 'corporate', 'stores', 'hr',
-              'appointments', 'emr', 'theatre', 'emergency', 'obstetrics',
-              'patient-portal', 'telemedicine', 'feedback', 'reports', 'compliance',
-              'audit', 'backup', 'api', 'settings'
+              'emr', 'theatre', 'emergency', 'obstetrics',
+              'patient-portal', 'telemedicine', 'feedback', 'compliance',
+              'audit', 'backup', 'api'
             ].map(module => (
               <Route 
                 key={module}
