@@ -1170,6 +1170,237 @@ export type Database = {
         }
         Relationships: []
       }
+      imaging_orders: {
+        Row: {
+          body_part: string
+          branch_id: string
+          clinical_indication: string
+          contrast_required: boolean | null
+          created_at: string
+          facility_name: string | null
+          id: string
+          order_date: string
+          order_number: string
+          ordered_by: string
+          patient_id: string
+          prep_instructions: string | null
+          scheduled_date: string | null
+          scheduled_time: string | null
+          special_instructions: string | null
+          status: string | null
+          study_type: string
+          tenant_id: string
+          updated_at: string
+          urgency: string | null
+        }
+        Insert: {
+          body_part: string
+          branch_id: string
+          clinical_indication: string
+          contrast_required?: boolean | null
+          created_at?: string
+          facility_name?: string | null
+          id?: string
+          order_date?: string
+          order_number: string
+          ordered_by: string
+          patient_id: string
+          prep_instructions?: string | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          study_type: string
+          tenant_id: string
+          updated_at?: string
+          urgency?: string | null
+        }
+        Update: {
+          body_part?: string
+          branch_id?: string
+          clinical_indication?: string
+          contrast_required?: boolean | null
+          created_at?: string
+          facility_name?: string | null
+          id?: string
+          order_date?: string
+          order_number?: string
+          ordered_by?: string
+          patient_id?: string
+          prep_instructions?: string | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          study_type?: string
+          tenant_id?: string
+          updated_at?: string
+          urgency?: string | null
+        }
+        Relationships: []
+      }
+      imaging_reports: {
+        Row: {
+          clinical_history: string | null
+          created_at: string
+          critical_communicated_to: string | null
+          critical_communication_date: string | null
+          critical_findings: boolean | null
+          dictated_date: string | null
+          findings: string
+          id: string
+          imaging_study_id: string
+          impression: string
+          radiologist: string | null
+          recommendations: string | null
+          report_number: string
+          report_status: string | null
+          report_text: string | null
+          technique: string | null
+          tenant_id: string
+          transcribed_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          clinical_history?: string | null
+          created_at?: string
+          critical_communicated_to?: string | null
+          critical_communication_date?: string | null
+          critical_findings?: boolean | null
+          dictated_date?: string | null
+          findings: string
+          id?: string
+          imaging_study_id: string
+          impression: string
+          radiologist?: string | null
+          recommendations?: string | null
+          report_number: string
+          report_status?: string | null
+          report_text?: string | null
+          technique?: string | null
+          tenant_id: string
+          transcribed_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          clinical_history?: string | null
+          created_at?: string
+          critical_communicated_to?: string | null
+          critical_communication_date?: string | null
+          critical_findings?: boolean | null
+          dictated_date?: string | null
+          findings?: string
+          id?: string
+          imaging_study_id?: string
+          impression?: string
+          radiologist?: string | null
+          recommendations?: string | null
+          report_number?: string
+          report_status?: string | null
+          report_text?: string | null
+          technique?: string | null
+          tenant_id?: string
+          transcribed_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      imaging_studies: {
+        Row: {
+          accession_number: string | null
+          body_part: string
+          branch_id: string
+          contrast_type: string | null
+          contrast_used: boolean | null
+          created_at: string
+          file_size_mb: number | null
+          findings: string | null
+          id: string
+          image_count: number | null
+          impression: string | null
+          indication: string
+          modality: string
+          patient_id: string
+          performing_physician: string | null
+          priority: string | null
+          radiation_dose: number | null
+          radiologist: string | null
+          recommendations: string | null
+          referring_physician: string | null
+          status: string | null
+          storage_location: string | null
+          study_date: string
+          study_time: string | null
+          study_type: string
+          study_uid: string | null
+          technique: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          accession_number?: string | null
+          body_part: string
+          branch_id: string
+          contrast_type?: string | null
+          contrast_used?: boolean | null
+          created_at?: string
+          file_size_mb?: number | null
+          findings?: string | null
+          id?: string
+          image_count?: number | null
+          impression?: string | null
+          indication: string
+          modality: string
+          patient_id: string
+          performing_physician?: string | null
+          priority?: string | null
+          radiation_dose?: number | null
+          radiologist?: string | null
+          recommendations?: string | null
+          referring_physician?: string | null
+          status?: string | null
+          storage_location?: string | null
+          study_date: string
+          study_time?: string | null
+          study_type: string
+          study_uid?: string | null
+          technique?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          accession_number?: string | null
+          body_part?: string
+          branch_id?: string
+          contrast_type?: string | null
+          contrast_used?: boolean | null
+          created_at?: string
+          file_size_mb?: number | null
+          findings?: string | null
+          id?: string
+          image_count?: number | null
+          impression?: string | null
+          indication?: string
+          modality?: string
+          patient_id?: string
+          performing_physician?: string | null
+          priority?: string | null
+          radiation_dose?: number | null
+          radiologist?: string | null
+          recommendations?: string | null
+          referring_physician?: string | null
+          status?: string | null
+          storage_location?: string | null
+          study_date?: string
+          study_time?: string | null
+          study_type?: string
+          study_uid?: string | null
+          technique?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       insurance_claims: {
         Row: {
           approved_amount: number | null
@@ -1500,6 +1731,72 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_orders: {
+        Row: {
+          branch_id: string
+          clinical_indication: string | null
+          collection_date: string | null
+          created_at: string
+          fasting_required: boolean | null
+          id: string
+          lab_facility: string | null
+          order_date: string
+          order_number: string
+          ordered_by: string
+          ordering_physician: string | null
+          patient_id: string
+          patient_preparation: string | null
+          priority: string | null
+          special_instructions: string | null
+          status: string | null
+          tenant_id: string
+          tests_ordered: Json
+          updated_at: string
+        }
+        Insert: {
+          branch_id: string
+          clinical_indication?: string | null
+          collection_date?: string | null
+          created_at?: string
+          fasting_required?: boolean | null
+          id?: string
+          lab_facility?: string | null
+          order_date?: string
+          order_number: string
+          ordered_by: string
+          ordering_physician?: string | null
+          patient_id: string
+          patient_preparation?: string | null
+          priority?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          tenant_id: string
+          tests_ordered?: Json
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string
+          clinical_indication?: string | null
+          collection_date?: string | null
+          created_at?: string
+          fasting_required?: boolean | null
+          id?: string
+          lab_facility?: string | null
+          order_date?: string
+          order_number?: string
+          ordered_by?: string
+          ordering_physician?: string | null
+          patient_id?: string
+          patient_preparation?: string | null
+          priority?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          tenant_id?: string
+          tests_ordered?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lab_results: {
         Row: {
           appointment_id: string | null
@@ -1734,6 +2031,105 @@ export type Database = {
         }
         Relationships: []
       }
+      medication_adherence: {
+        Row: {
+          adherence_date: string
+          adherence_percentage: number | null
+          created_at: string
+          doses_prescribed: number
+          doses_taken: number | null
+          id: string
+          missed_doses: number | null
+          patient_id: string
+          patient_reported_issues: string | null
+          prescription_id: string
+          recorded_by: string | null
+          side_effects: string[] | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          adherence_date: string
+          adherence_percentage?: number | null
+          created_at?: string
+          doses_prescribed: number
+          doses_taken?: number | null
+          id?: string
+          missed_doses?: number | null
+          patient_id: string
+          patient_reported_issues?: string | null
+          prescription_id: string
+          recorded_by?: string | null
+          side_effects?: string[] | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          adherence_date?: string
+          adherence_percentage?: number | null
+          created_at?: string
+          doses_prescribed?: number
+          doses_taken?: number | null
+          id?: string
+          missed_doses?: number | null
+          patient_id?: string
+          patient_reported_issues?: string | null
+          prescription_id?: string
+          recorded_by?: string | null
+          side_effects?: string[] | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      medication_interactions: {
+        Row: {
+          clinical_significance: string | null
+          created_at: string
+          description: string
+          evidence_level: string | null
+          id: string
+          interaction_type: string
+          is_active: boolean | null
+          management_recommendations: string | null
+          medication_1: string
+          medication_2: string
+          severity_level: number | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          clinical_significance?: string | null
+          created_at?: string
+          description: string
+          evidence_level?: string | null
+          id?: string
+          interaction_type: string
+          is_active?: boolean | null
+          management_recommendations?: string | null
+          medication_1: string
+          medication_2: string
+          severity_level?: number | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          clinical_significance?: string | null
+          created_at?: string
+          description?: string
+          evidence_level?: string | null
+          id?: string
+          interaction_type?: string
+          is_active?: boolean | null
+          management_recommendations?: string | null
+          medication_1?: string
+          medication_2?: string
+          severity_level?: number | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       patient_allergies: {
         Row: {
           allergen: string
@@ -1917,6 +2313,63 @@ export type Database = {
           payment_method?: string
           processed_by?: string | null
           reference_number?: string | null
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prescription_renewals: {
+        Row: {
+          approval_date: string | null
+          approved_by: string | null
+          branch_id: string
+          created_at: string
+          id: string
+          modifications: Json | null
+          notes: string | null
+          original_prescription_id: string
+          patient_id: string
+          reason_for_renewal: string | null
+          renewal_type: string | null
+          request_date: string
+          requested_by: string | null
+          status: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          approval_date?: string | null
+          approved_by?: string | null
+          branch_id: string
+          created_at?: string
+          id?: string
+          modifications?: Json | null
+          notes?: string | null
+          original_prescription_id: string
+          patient_id: string
+          reason_for_renewal?: string | null
+          renewal_type?: string | null
+          request_date?: string
+          requested_by?: string | null
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          approval_date?: string | null
+          approved_by?: string | null
+          branch_id?: string
+          created_at?: string
+          id?: string
+          modifications?: Json | null
+          notes?: string | null
+          original_prescription_id?: string
+          patient_id?: string
+          reason_for_renewal?: string | null
+          renewal_type?: string | null
+          request_date?: string
+          requested_by?: string | null
           status?: string | null
           tenant_id?: string
           updated_at?: string
