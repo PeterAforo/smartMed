@@ -21,11 +21,11 @@ interface RoomBooking {
   id: string
   room_name: string
   room_type: string | null
-  equipment_required: string[]
+  equipment_required: any // Json type from Supabase
   booking_date: string
   start_time: string
   end_time: string
-  status: 'booked' | 'in-use' | 'completed' | 'cancelled'
+  status: string // Allow any string from database
   notes: string | null
   appointment_id: string | null
   appointments?: {
@@ -269,7 +269,7 @@ export default function ResourceScheduler() {
     setFormData({
       room_name: booking.room_name,
       room_type: booking.room_type || 'consultation',
-      equipment_required: booking.equipment_required || [],
+      equipment_required: Array.isArray(booking.equipment_required) ? booking.equipment_required : [],
       booking_date: parseISO(booking.booking_date),
       start_time: booking.start_time,
       end_time: booking.end_time,
@@ -296,7 +296,7 @@ export default function ResourceScheduler() {
     }
   }
 
-  const rooms = [...new Set(bookings?.map(b => b.room_name))] || []
+  const rooms = [...new Set(bookings?.map(b => b.room_name))]
   const bookedCount = bookings?.filter(b => b.status === 'booked').length || 0
   const inUseCount = bookings?.filter(b => b.status === 'in-use').length || 0
 
@@ -604,11 +604,11 @@ export default function ResourceScheduler() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {booking.equipment_required && booking.equipment_required.length > 0 ? (
+                      {Array.isArray(booking.equipment_required) && booking.equipment_required.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
-                          {booking.equipment_required.slice(0, 2).map((eq, index) => (
+                          {booking.equipment_required.slice(0, 2).map((eq: any, index: number) => (
                             <Badge key={index} variant="secondary" className="text-xs">
-                              {eq}
+                              {String(eq)}
                             </Badge>
                           ))}
                           {booking.equipment_required.length > 2 && (
