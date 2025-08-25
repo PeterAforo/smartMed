@@ -26,6 +26,10 @@ import Pharmacy from "./pages/Pharmacy";
 import Doctor from "./pages/Doctor";
 import Nurse from "./pages/Nurse";
 import Emergency from "./pages/Emergency";
+import Inpatient from "./pages/Inpatient";
+import Ward from "./pages/Ward";
+import Accounts from "./pages/Accounts";
+import Cashier from "./pages/Cashier";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -224,9 +228,41 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/inpatient" 
+              element={
+                <ProtectedRoute>
+                  <Inpatient />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ward" 
+              element={
+                <ProtectedRoute>
+                  <Ward />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/accounts" 
+              element={
+                <ProtectedRoute>
+                  <Accounts />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/cashier" 
+              element={
+                <ProtectedRoute>
+                  <Cashier />
+                </ProtectedRoute>
+              } 
+            />
             {/* Placeholder routes for remaining modules */}
             {[
-              'inpatient', 'ward', 'inventory', 'accounts', 'cashier', 'insurance', 'claims',
+              'inventory', 'insurance', 'claims',
               'imaging', 'radiology', 'corporate', 'stores', 'hr',
               'emr', 'theatre', 'obstetrics',
               'patient-portal', 'telemedicine', 'feedback',
