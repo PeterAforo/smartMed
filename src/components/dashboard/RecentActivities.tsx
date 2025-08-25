@@ -133,11 +133,6 @@ export default function RecentActivities() {
                       {activity.description}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                    {activity.profiles && (
-                      <span className="text-xs text-muted-foreground">
-                        by {activity.profiles.first_name} {activity.profiles.last_name}
-                      </span>
-                    )}
                       <Badge variant="outline" className="text-xs">
                         {activity.activity_type.replace('_', ' ')}
                       </Badge>

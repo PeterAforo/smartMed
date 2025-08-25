@@ -102,7 +102,7 @@ export function useRecentActivities() {
         .from('activities')
         .select(`
           *,
-          profiles!activities_user_id_fkey(first_name, last_name)
+          profiles(first_name, last_name)
         `)
         .eq('tenant_id', tenant.id)
         .match(branchFilter)

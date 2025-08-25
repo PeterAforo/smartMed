@@ -106,7 +106,7 @@ export default function DashboardStats() {
       title: "Active Beds",
       value: statsData?.activeBeds || "0/0",
       change: `${statsData?.bedOccupancyRate || 0}%`,
-      trend: Number(statsData?.bedOccupancyRate || 0) > 80 ? 'up' : 'down',
+      trend: Number(statsData?.bedOccupancyRate || 0) > 80 ? ('up' as const) : ('down' as const),
       icon: Bed,
       description: "occupancy rate"
     },
