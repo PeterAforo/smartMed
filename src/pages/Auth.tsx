@@ -6,12 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Lock, Mail, User, IdCard } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import nchsLogo from '@/assets/nchs-logo.png';
 
 export default function Auth() {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -19,9 +18,7 @@ export default function Auth() {
   const [employeeId, setEmployeeId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
   const { user, signIn, signUp } = useAuth();
-  const { toast } = useToast();
 
   // Redirect if already authenticated
   if (user) {
@@ -34,39 +31,58 @@ export default function Auth() {
     setError('');
 
     try {
-      if (mode === 'login') {
+      if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
-          setError(error.message);
-        } else {
-          toast({
-            title: "Login Successful",
-            description: "Welcome to NCHS Hospital Management System!",
-          });
+          if (error.message?.includes('Invalid login credentials')) {
+            setError('Invalid email or password. Please check your credentials.');
+          } else if (error.message?.includes('Email not confirmed')) {
+            setError('Please check your email and confirm your account before signing in.');
+          } else {
+            setError(error.message || 'Login failed. Please try again.');
+          }
         }
       } else {
+        if (!firstName.trim() || !lastName.trim()) {
+          setError('First name and last name are required.');
+          return;
+        }
+        
         const { error } = await signUp(email, password, {
-          first_name: firstName,
-          last_name: lastName,
-          employee_id: employeeId
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          employee_id: employeeId.trim() || undefined
         });
+        
         if (error) {
-          setError(error.message);
-        } else {
-          toast({
-            title: "Account Created",
-            description: "Please check your email to verify your account.",
-          });
-          setMode('login');
+          if (error.message?.includes('User already registered')) {
+            setError('An account with this email already exists. Please sign in instead.');
+          } else if (error.message?.includes('Password should be at least')) {
+            setError('Password must be at least 6 characters long.');
+          } else {
+            setError(error.message || 'Registration failed. Please try again.');
+          }
         }
       }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setError('');
+    setEmail('');
+    setPassword('');
+    setFirstName('');
+    setLastName('');
+    setEmployeeId('');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary-light/20 to-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-background p-4">
       <Card className="w-full max-w-md healthcare-card border-0 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -81,14 +97,14 @@ export default function Auth() {
               NCHS Hospital Management
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
+              {isLogin ? 'Sign in to your account' : 'Create your account'}
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {error && (
-            <Alert className="border-destructive/20 bg-destructive-light">
+            <Alert className="border-destructive/20 bg-destructive/5">
               <AlertDescription className="text-destructive">
                 {error}
               </AlertDescription>
@@ -96,12 +112,12 @@ export default function Auth() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'signup' && (
+            {!isLogin && (
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName" className="text-foreground font-medium">
-                      First Name
+                      First Name *
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -112,13 +128,13 @@ export default function Auth() {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         className="pl-10 border-border bg-background"
-                        required
+                        required={!isLogin}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName" className="text-foreground font-medium">
-                      Last Name
+                      Last Name *
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -129,7 +145,7 @@ export default function Auth() {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         className="pl-10 border-border bg-background"
-                        required
+                        required={!isLogin}
                       />
                     </div>
                   </div>
@@ -137,7 +153,7 @@ export default function Auth() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="employeeId" className="text-foreground font-medium">
-                    Employee ID
+                    Employee ID (Optional)
                   </Label>
                   <div className="relative">
                     <IdCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -163,7 +179,7 @@ export default function Auth() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your.email@nchs.com"
+                  placeholder="your.email@hospital.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 border-border bg-background"
@@ -188,6 +204,11 @@ export default function Auth() {
                   required
                 />
               </div>
+              {!isLogin && (
+                <p className="text-xs text-muted-foreground">
+                  Password must be at least 6 characters long
+                </p>
+              )}
             </div>
 
             <Button 
@@ -198,24 +219,21 @@ export default function Auth() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {mode === 'login' ? 'Signing In...' : 'Creating Account...'}
+                  {isLogin ? 'Signing In...' : 'Creating Account...'}
                 </>
               ) : (
-                mode === 'login' ? 'Sign In' : 'Create Account'
+                isLogin ? 'Sign In' : 'Create Account'
               )}
             </Button>
           </form>
 
           <div className="text-center">
             <Button
-              variant="ghost"
-              onClick={() => {
-                setMode(mode === 'login' ? 'signup' : 'login');
-                setError('');
-              }}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              variant="link"
+              onClick={toggleMode}
+              className="text-primary hover:text-primary/80"
             >
-              {mode === 'login' 
+              {isLogin 
                 ? "Don't have an account? Sign up" 
                 : "Already have an account? Sign in"
               }
