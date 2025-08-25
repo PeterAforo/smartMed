@@ -28,7 +28,7 @@ export function ReportGenerator() {
     to: endOfMonth(new Date())
   });
   const [includeCharts, setIncludeCharts] = useState(true);
-  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [selectedBranch, setSelectedBranch] = useState<string>('all-branches');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [lastGenerated, setLastGenerated] = useState<Date | null>(null);
@@ -53,7 +53,7 @@ export function ReportGenerator() {
           reportType,
           startDate: format(dateRange.from, 'yyyy-MM-dd'),
           endDate: format(dateRange.to, 'yyyy-MM-dd'),
-          branchId: selectedBranch || undefined,
+          branchId: selectedBranch === 'all-branches' ? undefined : selectedBranch,
           includeCharts,
           format: reportFormat
         }
@@ -120,7 +120,7 @@ export function ReportGenerator() {
           format: exportFormat,
           startDate: format(dateRange.from, 'yyyy-MM-dd'),
           endDate: format(dateRange.to, 'yyyy-MM-dd'),
-          branchId: selectedBranch || undefined
+          branchId: selectedBranch === 'all-branches' ? undefined : selectedBranch
         }
       });
 
@@ -223,7 +223,7 @@ export function ReportGenerator() {
                   <SelectValue placeholder="All branches" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Branches</SelectItem>
+                  <SelectItem value="all-branches">All Branches</SelectItem>
                   {branches?.map((branch) => (
                     <SelectItem key={branch.id} value={branch.id}>
                       {branch.name}
