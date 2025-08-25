@@ -52,9 +52,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import nchsLogo from "@/assets/nchs-logo.png";
 
-// All 33 NCHS modules
+// All 33 SmartMed modules
 const mainModules = [
   { title: "Dashboard", url: "/dashboard", icon: Activity },
   { title: "Registration", url: "/registration", icon: UserPlus },
@@ -126,15 +125,19 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           {!collapsed && (
             <>
-              <img src={nchsLogo} alt="NCHS" className="h-8 w-8 object-contain" />
+              <div className="p-1.5 bg-primary-foreground/10 rounded-lg">
+                <Stethoscope className="h-5 w-5 text-primary-foreground" />
+              </div>
               <div>
-                <h2 className="text-lg font-bold text-primary-foreground">NCHS</h2>
-                <p className="text-xs text-primary-foreground/80">Hospital Management</p>
+                <h2 className="text-lg font-bold text-primary-foreground">SmartMed</h2>
+                <p className="text-xs text-primary-foreground/80">Smart Healthcare</p>
               </div>
             </>
           )}
           {collapsed && (
-            <img src={nchsLogo} alt="NCHS" className="h-8 w-8 object-contain mx-auto" />
+            <div className="p-1.5 bg-primary-foreground/10 rounded-lg mx-auto">
+              <Stethoscope className="h-5 w-5 text-primary-foreground" />
+            </div>
           )}
         </div>
       </div>

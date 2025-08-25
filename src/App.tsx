@@ -52,7 +52,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* Placeholder routes for all NCHS modules */}
+            {/* Placeholder routes for all SmartMed modules */}
             {[
               'registration', 'checkin', 'inpatient', 'ward', 'doctor', 'nurse',
               'lab', 'inventory', 'accounts', 'cashier', 'insurance', 'claims',

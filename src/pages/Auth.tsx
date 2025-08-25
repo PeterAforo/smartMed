@@ -5,9 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Lock, Mail, User, IdCard } from 'lucide-react';
+import { Loader2, Lock, Mail, User, IdCard, Stethoscope } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import nchsLogo from '@/assets/nchs-logo.png';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -86,15 +85,13 @@ export default function Auth() {
       <Card className="w-full max-w-md healthcare-card border-0 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <img 
-              src={nchsLogo} 
-              alt="NCHS Hospital Management System" 
-              className="h-16 object-contain"
-            />
+            <div className="p-3 bg-primary/10 rounded-2xl">
+              <Stethoscope className="h-10 w-10 text-primary" />
+            </div>
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-foreground">
-              NCHS Hospital Management
+              SmartMed
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               {isLogin ? 'Sign in to your account' : 'Create your account'}

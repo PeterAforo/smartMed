@@ -102,10 +102,10 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold text-foreground">
-            Hospital Management Dashboard
+            SmartMed Dashboard
           </h1>
           <p className="text-muted-foreground">
-            Welcome back! Here's your hospital overview and AI-powered insights.
+            Welcome back! Here's your smart hospital overview and AI-powered insights.
           </p>
         </div>
 

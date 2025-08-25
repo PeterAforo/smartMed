@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.user) {
         toast({
           title: "Login Successful",
-          description: "Welcome to NCHS Hospital Management System!",
+          description: "Welcome to SmartMed!",
         });
         
         // Force page reload for clean state
