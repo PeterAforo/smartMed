@@ -30,6 +30,10 @@ import Inpatient from "./pages/Inpatient";
 import Ward from "./pages/Ward";
 import Accounts from "./pages/Accounts";
 import Cashier from "./pages/Cashier";
+import Inventory from "./pages/Inventory";
+import Insurance from "./pages/Insurance";
+import Claims from "./pages/Claims";
+import Imaging from "./pages/Imaging";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -260,10 +264,41 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/inventory" 
+              element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/insurance" 
+              element={
+                <ProtectedRoute>
+                  <Insurance />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/claims" 
+              element={
+                <ProtectedRoute>
+                  <Claims />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/imaging" 
+              element={
+                <ProtectedRoute>
+                  <Imaging />
+                </ProtectedRoute>
+              } 
+            />
             {/* Placeholder routes for remaining modules */}
             {[
-              'inventory', 'insurance', 'claims',
-              'imaging', 'radiology', 'corporate', 'stores', 'hr',
+              'radiology', 'corporate', 'stores', 'hr',
               'emr', 'theatre', 'obstetrics',
               'patient-portal', 'telemedicine', 'feedback',
               'audit', 'backup', 'api'
