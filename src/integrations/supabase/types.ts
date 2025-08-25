@@ -2098,9 +2098,220 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      analytics_appointment_types: {
+        Row: {
+          appointment_type: string | null
+          avg_duration: number | null
+          branch_id: string | null
+          completed_count: number | null
+          count: number | null
+          month: string | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_daily_appointments: {
+        Row: {
+          avg_duration: number | null
+          branch_id: string | null
+          cancelled_appointments: number | null
+          completed_appointments: number | null
+          date: string | null
+          emergency_appointments: number | null
+          no_show_appointments: number | null
+          tenant_id: string | null
+          total_appointments: number | null
+          unique_patients: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_monthly_revenue: {
+        Row: {
+          avg_transaction_amount: number | null
+          branch_id: string | null
+          month: string | null
+          paid_revenue: number | null
+          pending_revenue: number | null
+          tenant_id: string | null
+          total_revenue: number | null
+          total_transactions: number | null
+          unique_patients: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_patient_flow: {
+        Row: {
+          active_patients: number | null
+          branch_id: string | null
+          month: string | null
+          new_patients: number | null
+          pediatric_patients: number | null
+          senior_patients: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patients_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patients_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_queue_performance: {
+        Row: {
+          avg_wait_time: number | null
+          branch_id: string | null
+          completed_entries: number | null
+          date: string | null
+          max_wait_time: number | null
+          no_show_entries: number | null
+          tenant_id: string | null
+          total_queue_entries: number | null
+        }
+        Relationships: []
+      }
+      analytics_staff_performance: {
+        Row: {
+          avg_appointment_duration: number | null
+          branch_id: string | null
+          completed_appointments: number | null
+          month: string | null
+          revenue_generated: number | null
+          staff_id: string | null
+          staff_name: string | null
+          tenant_id: string | null
+          total_appointments: number | null
+          unique_patients_served: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      get_appointment_analytics: {
+        Args: {
+          end_date: string
+          start_date: string
+          target_branch_id?: string
+          target_tenant_id: string
+        }
+        Returns: {
+          avg_duration: number
+          cancelled_appointments: number
+          completed_appointments: number
+          date: string
+          no_show_appointments: number
+          total_appointments: number
+          unique_patients: number
+        }[]
+      }
+      get_patient_flow_analytics: {
+        Args: {
+          end_date: string
+          start_date: string
+          target_branch_id?: string
+          target_tenant_id: string
+        }
+        Returns: {
+          active_patients: number
+          month: string
+          new_patients: number
+          pediatric_patients: number
+          senior_patients: number
+        }[]
+      }
+      get_revenue_analytics: {
+        Args: {
+          end_date: string
+          start_date: string
+          target_branch_id?: string
+          target_tenant_id: string
+        }
+        Returns: {
+          avg_transaction_amount: number
+          month: string
+          paid_revenue: number
+          pending_revenue: number
+          total_revenue: number
+          total_transactions: number
+          unique_patients: number
+        }[]
+      }
       get_user_branch_ids: {
         Args: Record<PropertyKey, never>
         Returns: string[]
