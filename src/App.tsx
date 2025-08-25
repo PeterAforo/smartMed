@@ -34,6 +34,10 @@ import Inventory from "./pages/Inventory";
 import Insurance from "./pages/Insurance";
 import Claims from "./pages/Claims";
 import Imaging from "./pages/Imaging";
+import Radiology from "./pages/Radiology";
+import Corporate from "./pages/Corporate";
+import Stores from "./pages/Stores";
+import HR from "./pages/HR";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -296,9 +300,41 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            {/* Working module routes continued */}
+            <Route 
+              path="/radiology" 
+              element={
+                <ProtectedRoute>
+                  <Radiology />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/corporate" 
+              element={
+                <ProtectedRoute>
+                  <Corporate />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/stores" 
+              element={
+                <ProtectedRoute>
+                  <Stores />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hr" 
+              element={
+                <ProtectedRoute>
+                  <HR />
+                </ProtectedRoute>
+              } 
+            />
             {/* Placeholder routes for remaining modules */}
             {[
-              'radiology', 'corporate', 'stores', 'hr',
               'emr', 'theatre', 'obstetrics',
               'patient-portal', 'telemedicine', 'feedback',
               'audit', 'backup', 'api'
