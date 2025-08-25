@@ -14,6 +14,399 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          activity_type: string
+          branch_id: string | null
+          created_at: string
+          description: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          branch_id?: string | null
+          created_at?: string
+          description: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          branch_id?: string | null
+          created_at?: string
+          description?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          action_taken: boolean | null
+          action_taken_at: string | null
+          action_taken_by: string | null
+          branch_id: string | null
+          confidence_score: number | null
+          created_at: string
+          data_sources: string[] | null
+          description: string
+          expires_at: string | null
+          id: string
+          insight_type: string
+          is_actionable: boolean | null
+          metrics: Json | null
+          priority: string
+          recommendations: Json | null
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: boolean | null
+          action_taken_at?: string | null
+          action_taken_by?: string | null
+          branch_id?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          data_sources?: string[] | null
+          description: string
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          is_actionable?: boolean | null
+          metrics?: Json | null
+          priority?: string
+          recommendations?: Json | null
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: boolean | null
+          action_taken_at?: string | null
+          action_taken_by?: string | null
+          branch_id?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          data_sources?: string[] | null
+          description?: string
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          is_actionable?: boolean | null
+          metrics?: Json | null
+          priority?: string
+          recommendations?: Json | null
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_insights_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          auto_resolve_at: string | null
+          branch_id: string | null
+          created_at: string
+          created_by: string | null
+          entity_id: string | null
+          entity_type: string | null
+          escalation_level: number | null
+          id: string
+          message: string
+          metadata: Json | null
+          priority: number
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          auto_resolve_at?: string | null
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          escalation_level?: number | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          priority?: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          auto_resolve_at?: string | null
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          escalation_level?: number | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          priority?: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          appointment_type: string
+          billing_amount: number | null
+          branch_id: string
+          chief_complaint: string | null
+          created_at: string
+          created_by: string | null
+          diagnosis: Json | null
+          duration_minutes: number | null
+          follow_up_date: string | null
+          follow_up_required: boolean | null
+          id: string
+          insurance_claim_id: string | null
+          notes: string | null
+          patient_id: string
+          staff_id: string | null
+          status: string
+          tenant_id: string
+          treatment_plan: string | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          appointment_type?: string
+          billing_amount?: number | null
+          branch_id: string
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          diagnosis?: Json | null
+          duration_minutes?: number | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          insurance_claim_id?: string | null
+          notes?: string | null
+          patient_id: string
+          staff_id?: string | null
+          status?: string
+          tenant_id: string
+          treatment_plan?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          appointment_type?: string
+          billing_amount?: number | null
+          branch_id?: string
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          diagnosis?: Json | null
+          duration_minutes?: number | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          insurance_claim_id?: string | null
+          notes?: string | null
+          patient_id?: string
+          staff_id?: string | null
+          status?: string
+          tenant_id?: string
+          treatment_plan?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beds: {
+        Row: {
+          admitted_at: string | null
+          bed_number: string
+          bed_type: string
+          branch_id: string
+          created_at: string
+          daily_rate: number | null
+          department: string | null
+          expected_discharge: string | null
+          features: Json | null
+          id: string
+          patient_id: string | null
+          room_number: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          admitted_at?: string | null
+          bed_number: string
+          bed_type?: string
+          branch_id: string
+          created_at?: string
+          daily_rate?: number | null
+          department?: string | null
+          expected_discharge?: string | null
+          features?: Json | null
+          id?: string
+          patient_id?: string | null
+          room_number?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          admitted_at?: string | null
+          bed_number?: string
+          bed_type?: string
+          branch_id?: string
+          created_at?: string
+          daily_rate?: number | null
+          department?: string | null
+          expected_discharge?: string | null
+          features?: Json | null
+          id?: string
+          patient_id?: string | null
+          room_number?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beds_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beds_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beds_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       branches: {
         Row: {
           address: string | null
@@ -64,6 +457,93 @@ export type Database = {
           },
         ]
       }
+      patients: {
+        Row: {
+          address: string | null
+          allergies: string[] | null
+          branch_id: string
+          created_at: string
+          created_by: string | null
+          current_medications: Json | null
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          insurance_info: Json | null
+          last_name: string
+          medical_history: Json | null
+          patient_number: string
+          phone: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string[] | null
+          branch_id: string
+          created_at?: string
+          created_by?: string | null
+          current_medications?: Json | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          insurance_info?: Json | null
+          last_name: string
+          medical_history?: Json | null
+          patient_number: string
+          phone?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          allergies?: string[] | null
+          branch_id?: string
+          created_at?: string
+          created_by?: string | null
+          current_medications?: Json | null
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          insurance_info?: Json | null
+          last_name?: string
+          medical_history?: Json | null
+          patient_number?: string
+          phone?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patients_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patients_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -107,6 +587,95 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      revenue: {
+        Row: {
+          amount: number
+          appointment_id: string | null
+          branch_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          id: string
+          invoice_number: string | null
+          metadata: Json | null
+          patient_id: string | null
+          payment_method: string | null
+          payment_status: string
+          revenue_type: string
+          tenant_id: string
+          transaction_date: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          appointment_id?: string | null
+          branch_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          id?: string
+          invoice_number?: string | null
+          metadata?: Json | null
+          patient_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          revenue_type: string
+          tenant_id: string
+          transaction_date?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          appointment_id?: string | null
+          branch_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          id?: string
+          invoice_number?: string | null
+          metadata?: Json | null
+          patient_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          revenue_type?: string
+          tenant_id?: string
+          transaction_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenue_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
