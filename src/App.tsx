@@ -13,6 +13,7 @@ import Appointments from "./pages/Appointments";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Communications from "./pages/Communications";
+import Quality from "./pages/Quality";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -96,6 +97,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Communications />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/quality" 
+              element={
+                <ProtectedRoute>
+                  <Quality />
                 </ProtectedRoute>
               } 
             />
