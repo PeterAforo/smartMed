@@ -86,6 +86,7 @@ const mainModules = [
 
 const systemModules = [
   { title: "Reports & Analytics", url: "/reports", icon: BarChart3 },
+  { title: "Advanced Analytics", url: "/analytics", icon: Activity },
   { title: "Quality & Compliance", url: "/compliance", icon: CheckCircle },
   { title: "Audit & Logging", url: "/audit", icon: Archive },
   { title: "Backup & Recovery", url: "/backup", icon: Database },

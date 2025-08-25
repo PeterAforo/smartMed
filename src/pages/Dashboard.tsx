@@ -3,6 +3,7 @@ import { RoleBasedStats } from "@/components/dashboard/RoleBasedStats";
 import RecentActivities from "@/components/dashboard/RecentActivities";
 import AIInsights from "@/components/dashboard/AIInsights";
 import QuickActions from "@/components/dashboard/QuickActions";
+import { DashboardAnalyticsSection } from "@/components/analytics/DashboardAnalyticsSection";
 
 export default function Dashboard() {
   return (
@@ -20,6 +21,9 @@ export default function Dashboard() {
 
         {/* Role-based Key Stats */}
         <RoleBasedStats />
+
+        {/* Analytics Overview */}
+        <DashboardAnalyticsSection />
 
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
