@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Plus, Search, Filter, Calendar, Clock, User, Phone, Eye, Edit, CheckCircle, XCircle } from "lucide-react"
+import { Plus, Search, Filter, Calendar, Clock, User, Phone, Eye, Edit, CheckCircle, XCircle, FileText, Users, MapPin, Bell, Repeat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +10,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import { ScheduleAppointmentModal } from "@/components/dashboard/modals/ScheduleAppointmentModal"
+import AppointmentTemplateManager from "@/components/appointments/AppointmentTemplateManager"
+import RecurringAppointmentDialog from "@/components/appointments/RecurringAppointmentDialog"
+import QueueDashboard from "@/components/appointments/QueueDashboard"
+import ResourceScheduler from "@/components/appointments/ResourceScheduler"
+import ReminderSettings from "@/components/appointments/ReminderSettings"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery } from "@tanstack/react-query"
@@ -21,6 +26,8 @@ export default function Appointments() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [dateFilter, setDateFilter] = useState("all")
   const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false)
+  const [showRecurringDialog, setShowRecurringDialog] = useState(false)
+  const [activeTab, setActiveTab] = useState("appointments")
 
   const { data: appointments, isLoading, refetch } = useQuery({
     queryKey: ['appointments', currentBranch?.id],
@@ -130,14 +137,51 @@ export default function Appointments() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Appointments</h1>
-            <p className="text-muted-foreground">Schedule and manage patient appointments</p>
+            <h1 className="text-3xl font-bold text-foreground">Advanced Appointments</h1>
+            <p className="text-muted-foreground">Comprehensive appointment management system</p>
           </div>
-          <Button onClick={() => setShowNewAppointmentModal(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Appointment
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowRecurringDialog(true)} 
+              className="gap-2"
+            >
+              <Repeat className="h-4 w-4" />
+              Recurring
+            </Button>
+            <Button onClick={() => setShowNewAppointmentModal(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Appointment
+            </Button>
+          </div>
         </div>
+
+        {/* Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="appointments" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              Appointments
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="queue" className="gap-2">
+              <Users className="h-4 w-4" />
+              Queue
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="gap-2">
+              <MapPin className="h-4 w-4" />
+              Resources
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="gap-2">
+              <Bell className="h-4 w-4" />
+              Reminders
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="appointments" className="space-y-6">
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-4">
@@ -317,10 +361,33 @@ export default function Appointments() {
           </CardContent>
         </Card>
 
-        {/* New Appointment Modal */}
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <AppointmentTemplateManager />
+          </TabsContent>
+
+          <TabsContent value="queue">
+            <QueueDashboard />
+          </TabsContent>
+
+          <TabsContent value="resources">
+            <ResourceScheduler />
+          </TabsContent>
+
+          <TabsContent value="reminders">
+            <ReminderSettings />
+          </TabsContent>
+        </Tabs>
+
+        {/* Modals */}
         <ScheduleAppointmentModal 
           open={showNewAppointmentModal} 
           onOpenChange={setShowNewAppointmentModal}
+        />
+        <RecurringAppointmentDialog
+          open={showRecurringDialog}
+          onOpenChange={setShowRecurringDialog}
         />
       </div>
     </DashboardLayout>
