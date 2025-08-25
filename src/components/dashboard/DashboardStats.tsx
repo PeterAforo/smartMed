@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Users, Bed, Activity, Heart, Calendar, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface StatCardProps {
   title: string;
@@ -40,6 +42,8 @@ function StatCard({ title, value, change, trend, icon: Icon, description }: Stat
 }
 
 export default function DashboardStats() {
+  const { currentBranch, hasCrossBranchAccess, tenant } = useAuth();
+
   const stats = [
     {
       title: "Total Patients",
@@ -92,18 +96,42 @@ export default function DashboardStats() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {stats.map((stat, index) => (
-        <StatCard
-          key={index}
-          title={stat.title}
-          value={stat.value}
-          change={stat.change}
-          trend={stat.trend}
-          icon={stat.icon}
-          description={stat.description}
-        />
-      ))}
+    <div className="space-y-4">
+      {/* Branch Context Header */}
+      {currentBranch && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground">
+              {hasCrossBranchAccess ? `${tenant?.name} - All Branches` : `${currentBranch.name}`}
+            </h3>
+            {!hasCrossBranchAccess && (
+              <Badge variant="outline" className="text-xs">
+                Branch Specific
+              </Badge>
+            )}
+          </div>
+          {hasCrossBranchAccess && (
+            <Badge variant="secondary" className="text-xs">
+              Cross-Branch Access
+            </Badge>
+          )}
+        </div>
+      )}
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {stats.map((stat, index) => (
+          <StatCard
+            key={index}
+            title={stat.title}
+            value={stat.value}
+            change={stat.change}
+            trend={stat.trend}
+            icon={stat.icon}
+            description={stat.description}
+          />
+        ))}
+      </div>
     </div>
   );
 }

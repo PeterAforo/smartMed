@@ -2,9 +2,10 @@ import { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Button } from "@/components/ui/button";
-import { Bell, Search, Menu } from "lucide-react";
+import { Bell, Search, User, Settings, KeyRound, Palette, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BranchSelector } from "@/components/ui/branch-selector";
 import { useAuth } from "@/hooks/useAuth";
 
 interface DashboardLayoutProps {
@@ -20,11 +22,15 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, profile, tenant, currentBranch } = useAuth();
 
-  const handleLogout = async () => {
-    await signOut();
-  };
+  const userInitials = profile 
+    ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`.toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || 'U';
+
+  const displayName = profile 
+    ? `${profile.first_name} ${profile.last_name}`.trim() || user?.email
+    : user?.email || 'User';
 
   return (
     <SidebarProvider>
@@ -48,51 +54,71 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
               </div>
 
+              {/* Center - Branch Selector */}
+              <div className="hidden md:block">
+                <BranchSelector />
+              </div>
+
               {/* Right side - Notifications and user */}
               <div className="flex items-center gap-3">
                 {/* Notifications */}
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full"></span>
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-destructive">
+                    3
+                  </Badge>
                 </Button>
 
                 {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src="" alt={user?.email} />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    <Button variant="ghost" className="flex items-center gap-2 px-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={profile?.avatar_url} />
+                        <AvatarFallback className="text-xs font-medium">
+                          {userInitials}
                         </AvatarFallback>
                       </Avatar>
+                      <div className="hidden sm:flex flex-col items-start text-left">
+                        <span className="text-sm font-medium">{displayName}</span>
+                        {tenant && (
+                          <span className="text-xs text-muted-foreground">{tenant.name}</span>
+                        )}
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuLabel className="font-normal">
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium">Hospital Staff</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user?.email}
-                        </p>
+                        <span className="font-semibold">{displayName}</span>
+                        <span className="text-xs text-muted-foreground">{user?.email}</span>
+                        {tenant && currentBranch && (
+                          <div className="text-xs text-muted-foreground">
+                            {tenant.name} - {currentBranch.name}
+                          </div>
+                        )}
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
                       Profile Settings
                     </DropdownMenuItem>
                     <DropdownMenuItem>
+                      <KeyRound className="mr-2 h-4 w-4" />
                       Change Password
                     </DropdownMenuItem>
                     <DropdownMenuItem>
+                      <Palette className="mr-2 h-4 w-4" />
                       Preferences
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                      onClick={handleLogout}
+                      onClick={signOut}
                       className="text-destructive focus:text-destructive"
                     >
-                      Log out
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
