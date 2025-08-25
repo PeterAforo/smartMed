@@ -16,6 +16,7 @@ import Communications from "./pages/Communications";
 import Quality from "./pages/Quality";
 import Settings from "./pages/Settings";
 import ClinicalWorkflow from "./pages/ClinicalWorkflow";
+import Mobile from "./pages/Mobile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -122,6 +123,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ClinicalWorkflow />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/mobile" 
+              element={
+                <ProtectedRoute>
+                  <Mobile />
                 </ProtectedRoute>
               } 
             />
