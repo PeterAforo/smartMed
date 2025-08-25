@@ -42,6 +42,11 @@ import EMR from "./pages/EMR";
 import Theatre from "./pages/Theatre";
 import Obstetrics from "./pages/Obstetrics";
 import PatientPortal from "./pages/PatientPortal";
+import Telemedicine from "./pages/Telemedicine";
+import Feedback from "./pages/Feedback";
+import Audit from "./pages/Audit";
+import Backup from "./pages/Backup";
+import API from "./pages/API";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -369,30 +374,46 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* Placeholder routes for remaining modules */}
-            {[
-              'telemedicine', 'feedback',
-              'audit', 'backup', 'api'
-            ].map(module => (
-              <Route 
-                key={module}
-                path={`/${module}`} 
-                element={
-                  <ProtectedRoute>
-                    <div className="min-h-screen flex items-center justify-center bg-background">
-                      <div className="text-center">
-                        <h1 className="text-3xl font-bold mb-4 text-primary capitalize">
-                          {module.replace('-', ' ')} Module
-                        </h1>
-                        <p className="text-muted-foreground">
-                          This module is under development and will be available soon.
-                        </p>
-                      </div>
-                    </div>
-                  </ProtectedRoute>
-                } 
-              />
-            ))}
+            <Route 
+              path="/telemedicine" 
+              element={
+                <ProtectedRoute>
+                  <Telemedicine />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/feedback" 
+              element={
+                <ProtectedRoute>
+                  <Feedback />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/audit" 
+              element={
+                <ProtectedRoute>
+                  <Audit />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/backup" 
+              element={
+                <ProtectedRoute>
+                  <Backup />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/api" 
+              element={
+                <ProtectedRoute>
+                  <API />
+                </ProtectedRoute>
+              } 
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
