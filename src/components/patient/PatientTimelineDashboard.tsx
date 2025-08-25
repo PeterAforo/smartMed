@@ -13,7 +13,7 @@ interface PatientTimelineDashboardProps {
   patientId: string;
 }
 
-export const PatientTimelineDashboard: React.FC<PatientTimelineDashboardProps> = ({ patientId }) => {
+const PatientTimelineDashboard: React.FC<PatientTimelineDashboardProps> = ({ patientId }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'all' | '30d' | '90d' | '1y'>('all');
 
   const { data: timelineData, isLoading } = useQuery({
@@ -312,3 +312,5 @@ export const PatientTimelineDashboard: React.FC<PatientTimelineDashboardProps> =
     </Card>
   );
 };
+
+export default PatientTimelineDashboard;

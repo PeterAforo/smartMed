@@ -62,7 +62,7 @@ interface WorkflowTaskWithRelations {
   };
 }
 
-export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patientId }) => {
+const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patientId }) => {
   const { profile, currentBranch } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -535,3 +535,5 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
     </Card>
   );
 };
+
+export default ClinicalWorkflowEngine;

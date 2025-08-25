@@ -85,6 +85,7 @@ const mainModules = [
 ];
 
 const systemModules = [
+  { title: "Clinical Workflow", url: "/clinical-workflow", icon: Activity },
   { title: "Reports & Analytics", url: "/reports", icon: BarChart3 },
   { title: "Advanced Analytics", url: "/analytics", icon: Activity },
   { title: "Quality & Compliance", url: "/compliance", icon: CheckCircle },

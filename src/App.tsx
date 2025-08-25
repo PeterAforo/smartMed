@@ -15,6 +15,7 @@ import Analytics from "./pages/Analytics";
 import Communications from "./pages/Communications";
 import Quality from "./pages/Quality";
 import Settings from "./pages/Settings";
+import ClinicalWorkflow from "./pages/ClinicalWorkflow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -113,6 +114,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/clinical-workflow" 
+              element={
+                <ProtectedRoute>
+                  <ClinicalWorkflow />
                 </ProtectedRoute>
               } 
             />
