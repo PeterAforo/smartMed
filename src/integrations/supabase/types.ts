@@ -759,6 +759,102 @@ export type Database = {
           },
         ]
       }
+      clinical_protocols: {
+        Row: {
+          approval_date: string | null
+          approved_by: string | null
+          condition_codes: Json | null
+          created_at: string
+          created_by: string | null
+          evidence_level: string | null
+          id: string
+          is_active: boolean | null
+          protocol_name: string
+          protocol_steps: Json
+          specialty: string | null
+          tenant_id: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          approval_date?: string | null
+          approved_by?: string | null
+          condition_codes?: Json | null
+          created_at?: string
+          created_by?: string | null
+          evidence_level?: string | null
+          id?: string
+          is_active?: boolean | null
+          protocol_name: string
+          protocol_steps?: Json
+          specialty?: string | null
+          tenant_id: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          approval_date?: string | null
+          approved_by?: string | null
+          condition_codes?: Json | null
+          created_at?: string
+          created_by?: string | null
+          evidence_level?: string | null
+          id?: string
+          is_active?: boolean | null
+          protocol_name?: string
+          protocol_steps?: Json
+          specialty?: string | null
+          tenant_id?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
+      clinical_workflows: {
+        Row: {
+          branch_id: string | null
+          conditions: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          steps: Json
+          tenant_id: string
+          updated_at: string
+          workflow_name: string
+          workflow_type: string
+        }
+        Insert: {
+          branch_id?: string | null
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          steps?: Json
+          tenant_id: string
+          updated_at?: string
+          workflow_name: string
+          workflow_type: string
+        }
+        Update: {
+          branch_id?: string | null
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          steps?: Json
+          tenant_id?: string
+          updated_at?: string
+          workflow_name?: string
+          workflow_type?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           branch_id: string
@@ -912,6 +1008,165 @@ export type Database = {
           tenant_id?: string
           updated_at?: string
           warranty_expiry?: string | null
+        }
+        Relationships: []
+      }
+      family_medical_history: {
+        Row: {
+          age_of_onset: number | null
+          condition_name: string
+          created_at: string
+          diagnosis_codes: Json | null
+          id: string
+          notes: string | null
+          patient_id: string
+          recorded_by: string | null
+          relationship: string
+          severity: string | null
+          status: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          age_of_onset?: number | null
+          condition_name: string
+          created_at?: string
+          diagnosis_codes?: Json | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          recorded_by?: string | null
+          relationship: string
+          severity?: string | null
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          age_of_onset?: number | null
+          condition_name?: string
+          created_at?: string
+          diagnosis_codes?: Json | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          recorded_by?: string | null
+          relationship?: string
+          severity?: string | null
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      follow_up_schedules: {
+        Row: {
+          appointment_id: string | null
+          branch_id: string
+          created_at: string
+          created_by: string | null
+          follow_up_type: string
+          id: string
+          notes: string | null
+          patient_id: string
+          reminder_sent: boolean | null
+          scheduled_date: string
+          status: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          branch_id: string
+          created_at?: string
+          created_by?: string | null
+          follow_up_type: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reminder_sent?: boolean | null
+          scheduled_date: string
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          branch_id?: string
+          created_at?: string
+          created_by?: string | null
+          follow_up_type?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reminder_sent?: boolean | null
+          scheduled_date?: string
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hospitalization_records: {
+        Row: {
+          admission_date: string
+          admission_reason: string
+          attending_physician: string | null
+          branch_id: string
+          created_at: string
+          department: string | null
+          discharge_date: string | null
+          discharge_summary: string | null
+          hospital_name: string
+          id: string
+          length_of_stay: number | null
+          patient_id: string
+          primary_diagnosis: string
+          recorded_by: string | null
+          secondary_diagnoses: Json | null
+          status: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          admission_date: string
+          admission_reason: string
+          attending_physician?: string | null
+          branch_id: string
+          created_at?: string
+          department?: string | null
+          discharge_date?: string | null
+          discharge_summary?: string | null
+          hospital_name: string
+          id?: string
+          length_of_stay?: number | null
+          patient_id: string
+          primary_diagnosis: string
+          recorded_by?: string | null
+          secondary_diagnoses?: Json | null
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          admission_date?: string
+          admission_reason?: string
+          attending_physician?: string | null
+          branch_id?: string
+          created_at?: string
+          department?: string | null
+          discharge_date?: string | null
+          discharge_summary?: string | null
+          hospital_name?: string
+          id?: string
+          length_of_stay?: number | null
+          patient_id?: string
+          primary_diagnosis?: string
+          recorded_by?: string | null
+          secondary_diagnoses?: Json | null
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1362,6 +1617,66 @@ export type Database = {
           test_code?: string
           test_name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      medical_documents: {
+        Row: {
+          branch_id: string
+          created_at: string
+          document_date: string | null
+          document_name: string
+          document_type: string
+          file_size: number | null
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          mime_type: string | null
+          patient_id: string
+          status: string | null
+          tags: string[] | null
+          tenant_id: string
+          updated_at: string
+          upload_date: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          branch_id: string
+          created_at?: string
+          document_date?: string | null
+          document_name: string
+          document_type: string
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          patient_id: string
+          status?: string | null
+          tags?: string[] | null
+          tenant_id: string
+          updated_at?: string
+          upload_date?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          branch_id?: string
+          created_at?: string
+          document_date?: string | null
+          document_name?: string
+          document_type?: string
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          patient_id?: string
+          status?: string | null
+          tags?: string[] | null
+          tenant_id?: string
+          updated_at?: string
+          upload_date?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }
@@ -1926,6 +2241,63 @@ export type Database = {
         }
         Relationships: []
       }
+      surgical_history: {
+        Row: {
+          anesthesia_type: string | null
+          branch_id: string
+          complications: string | null
+          created_at: string
+          hospital_name: string | null
+          id: string
+          notes: string | null
+          outcome: string | null
+          patient_id: string
+          procedure_code: string | null
+          procedure_name: string
+          recorded_by: string | null
+          surgeon_name: string | null
+          surgery_date: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          anesthesia_type?: string | null
+          branch_id: string
+          complications?: string | null
+          created_at?: string
+          hospital_name?: string | null
+          id?: string
+          notes?: string | null
+          outcome?: string | null
+          patient_id: string
+          procedure_code?: string | null
+          procedure_name: string
+          recorded_by?: string | null
+          surgeon_name?: string | null
+          surgery_date: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          anesthesia_type?: string | null
+          branch_id?: string
+          complications?: string | null
+          created_at?: string
+          hospital_name?: string | null
+          id?: string
+          notes?: string | null
+          outcome?: string | null
+          patient_id?: string
+          procedure_code?: string | null
+          procedure_name?: string
+          recorded_by?: string | null
+          surgeon_name?: string | null
+          surgery_date?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tenants: {
         Row: {
           code: string
@@ -2093,6 +2465,123 @@ export type Database = {
           temperature?: number | null
           tenant_id?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      workflow_instances: {
+        Row: {
+          assigned_to: string | null
+          branch_id: string
+          completed_at: string | null
+          created_at: string
+          current_step: number | null
+          id: string
+          metadata: Json | null
+          patient_id: string
+          priority: number | null
+          started_at: string
+          status: string | null
+          tenant_id: string
+          updated_at: string
+          workflow_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          branch_id: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          metadata?: Json | null
+          patient_id: string
+          priority?: number | null
+          started_at?: string
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+          workflow_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          branch_id?: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          metadata?: Json | null
+          patient_id?: string
+          priority?: number | null
+          started_at?: string
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
+          workflow_id?: string
+        }
+        Relationships: []
+      }
+      workflow_tasks: {
+        Row: {
+          actual_duration: number | null
+          assigned_to: string | null
+          branch_id: string
+          completed_at: string | null
+          completed_by: string | null
+          completion_notes: string | null
+          created_at: string
+          dependencies: Json | null
+          description: string | null
+          due_date: string | null
+          estimated_duration: number | null
+          id: string
+          priority: number | null
+          status: string | null
+          task_name: string
+          task_type: string | null
+          tenant_id: string
+          updated_at: string
+          workflow_instance_id: string
+        }
+        Insert: {
+          actual_duration?: number | null
+          assigned_to?: string | null
+          branch_id: string
+          completed_at?: string | null
+          completed_by?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          dependencies?: Json | null
+          description?: string | null
+          due_date?: string | null
+          estimated_duration?: number | null
+          id?: string
+          priority?: number | null
+          status?: string | null
+          task_name: string
+          task_type?: string | null
+          tenant_id: string
+          updated_at?: string
+          workflow_instance_id: string
+        }
+        Update: {
+          actual_duration?: number | null
+          assigned_to?: string | null
+          branch_id?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          dependencies?: Json | null
+          description?: string | null
+          due_date?: string | null
+          estimated_duration?: number | null
+          id?: string
+          priority?: number | null
+          status?: string | null
+          task_name?: string
+          task_type?: string | null
+          tenant_id?: string
+          updated_at?: string
+          workflow_instance_id?: string
         }
         Relationships: []
       }
