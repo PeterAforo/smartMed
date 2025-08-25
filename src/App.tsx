@@ -38,6 +38,10 @@ import Radiology from "./pages/Radiology";
 import Corporate from "./pages/Corporate";
 import Stores from "./pages/Stores";
 import HR from "./pages/HR";
+import EMR from "./pages/EMR";
+import Theatre from "./pages/Theatre";
+import Obstetrics from "./pages/Obstetrics";
+import PatientPortal from "./pages/PatientPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -333,10 +337,41 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/emr" 
+              element={
+                <ProtectedRoute>
+                  <EMR />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/theatre" 
+              element={
+                <ProtectedRoute>
+                  <Theatre />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/obstetrics" 
+              element={
+                <ProtectedRoute>
+                  <Obstetrics />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/patient-portal" 
+              element={
+                <ProtectedRoute>
+                  <PatientPortal />
+                </ProtectedRoute>
+              } 
+            />
             {/* Placeholder routes for remaining modules */}
             {[
-              'emr', 'theatre', 'obstetrics',
-              'patient-portal', 'telemedicine', 'feedback',
+              'telemedicine', 'feedback',
               'audit', 'backup', 'api'
             ].map(module => (
               <Route 
