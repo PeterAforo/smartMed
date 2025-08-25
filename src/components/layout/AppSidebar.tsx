@@ -104,8 +104,8 @@ export function AppSidebar() {
   
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-primary text-primary-foreground font-medium shadow-sm" 
-      : "hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors";
+      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-sm" 
+      : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80 hover:text-sidebar-foreground transition-colors";
 
   const handleLogout = () => {
     localStorage.removeItem('nchs_auth');
@@ -117,11 +117,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-72"} border-r bg-card/50 backdrop-blur-sm`}
+      className={`${collapsed ? "w-16" : "w-72"} border-r bg-sidebar shadow-sm`}
       collapsible="icon"
     >
       {/* Header */}
-      <div className="p-4 border-b bg-gradient-header">
+      <div className="p-4 border-b bg-sidebar-primary shadow-sm">
         <div className="flex items-center gap-3">
           {!collapsed && (
             <>
@@ -145,7 +145,7 @@ export function AppSidebar() {
       <SidebarContent className="flex flex-col h-full">
         {/* Main Modules */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
             {!collapsed && "Hospital Modules"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -175,7 +175,7 @@ export function AppSidebar() {
 
         {/* System Modules */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
             {!collapsed && "System & Admin"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
