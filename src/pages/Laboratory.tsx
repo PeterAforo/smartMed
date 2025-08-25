@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TestTube, Search, Clock, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { TestTube, Search, Clock, CheckCircle, AlertTriangle, FileText, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NewLabOrderDialog } from '@/components/laboratory/NewLabOrderDialog';
 
 const Laboratory = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNewOrderDialog, setShowNewOrderDialog] = useState(false);
   
   const [labOrders] = useState([
     {
@@ -208,6 +210,10 @@ const Laboratory = () => {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-64"
                     />
+                    <Button onClick={() => setShowNewOrderDialog(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      New Lab Order
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -351,6 +357,12 @@ const Laboratory = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <NewLabOrderDialog
+          open={showNewOrderDialog}
+          onOpenChange={setShowNewOrderDialog}
+        />
       </div>
     </DashboardLayout>
   );

@@ -9,9 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, Search, Clock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ViewAllRegistrationsDialog } from '@/components/registration/ViewAllRegistrationsDialog';
 
 const Registration = () => {
   const { toast } = useToast();
+  const [showAllRegistrationsDialog, setShowAllRegistrationsDialog] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -289,7 +291,7 @@ const Registration = () => {
                     </div>
                   ))}
                 </div>
-                <Button variant="outline" className="w-full mt-4">
+                <Button variant="outline" className="w-full mt-4" onClick={() => setShowAllRegistrationsDialog(true)}>
                   <Search className="mr-2 h-4 w-4" />
                   View All Registrations
                 </Button>
@@ -297,6 +299,12 @@ const Registration = () => {
             </Card>
           </div>
         </div>
+
+        {/* Dialogs */}
+        <ViewAllRegistrationsDialog
+          open={showAllRegistrationsDialog}
+          onOpenChange={setShowAllRegistrationsDialog}
+        />
       </div>
     </DashboardLayout>
   );

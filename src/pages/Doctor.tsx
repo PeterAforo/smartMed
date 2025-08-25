@@ -6,9 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Stethoscope, Calendar, Users, Clock, FileText, Pill } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ViewPatientDialog } from '@/components/doctor/ViewPatientDialog';
+import { CreatePrescriptionDialog } from '@/components/doctor/CreatePrescriptionDialog';
 
 const Doctor = () => {
   const { toast } = useToast();
+  
+  // Dialog states
+  const [showPatientDialog, setShowPatientDialog] = useState(false);
+  const [showPrescriptionDialog, setShowPrescriptionDialog] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
   
   const [todayAppointments] = useState([
     {
@@ -94,6 +101,10 @@ const Doctor = () => {
   };
 
   const handleStartConsultation = (appointmentId: number) => {
+    const appointment = todayAppointments.find(app => app.id === appointmentId);
+    if (appointment) {
+      appointment.status = 'in-progress';
+    }
     toast({
       title: "Consultation Started",
       description: "Patient consultation has been started."
@@ -101,10 +112,24 @@ const Doctor = () => {
   };
 
   const handleCompleteConsultation = (appointmentId: number) => {
+    const appointment = todayAppointments.find(app => app.id === appointmentId);
+    if (appointment) {
+      appointment.status = 'completed';
+    }
     toast({
       title: "Consultation Completed",
       description: "Patient consultation has been completed successfully."
     });
+  };
+
+  const handleViewPatient = (appointment: any) => {
+    setSelectedPatient({
+      id: appointment.id,
+      name: appointment.patient,
+      patientId: appointment.patientId,
+      complaint: appointment.complaint
+    });
+    setShowPatientDialog(true);
   };
 
   return (
@@ -213,7 +238,7 @@ const Doctor = () => {
                             Complete
                           </Button>
                         )}
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleViewPatient(appointment)}>
                           View Patient
                         </Button>
                       </div>
@@ -315,7 +340,7 @@ const Doctor = () => {
                   <p className="text-muted-foreground mb-4">
                     Create electronic prescriptions for your patients
                   </p>
-                  <Button>
+                  <Button onClick={() => setShowPrescriptionDialog(true)}>
                     <Pill className="mr-2 h-4 w-4" />
                     Create New Prescription
                   </Button>
@@ -361,6 +386,18 @@ const Doctor = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <ViewPatientDialog
+          open={showPatientDialog}
+          onOpenChange={setShowPatientDialog}
+          patient={selectedPatient}
+        />
+        
+        <CreatePrescriptionDialog
+          open={showPrescriptionDialog}
+          onOpenChange={setShowPrescriptionDialog}
+        />
       </div>
     </DashboardLayout>
   );
