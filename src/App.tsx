@@ -19,6 +19,13 @@ import ClinicalWorkflow from "./pages/ClinicalWorkflow";
 import Mobile from "./pages/Mobile";
 import Operations from "./pages/Operations";
 import Finance from "./pages/Finance";
+import Registration from "./pages/Registration";
+import CheckIn from "./pages/CheckIn";
+import Laboratory from "./pages/Laboratory";
+import Pharmacy from "./pages/Pharmacy";
+import Doctor from "./pages/Doctor";
+import Nurse from "./pages/Nurse";
+import Emergency from "./pages/Emergency";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -152,13 +159,77 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* Placeholder routes for all SmartMed modules */}
+            {/* Working module routes */}
+            <Route 
+              path="/registration" 
+              element={
+                <ProtectedRoute>
+                  <Registration />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/checkin" 
+              element={
+                <ProtectedRoute>
+                  <CheckIn />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/lab" 
+              element={
+                <ProtectedRoute>
+                  <Laboratory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pharmacy" 
+              element={
+                <ProtectedRoute>
+                  <Pharmacy />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/doctor" 
+              element={
+                <ProtectedRoute>
+                  <Doctor />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/nurse" 
+              element={
+                <ProtectedRoute>
+                  <Nurse />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/emergency" 
+              element={
+                <ProtectedRoute>
+                  <Emergency />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/compliance" 
+              element={
+                <ProtectedRoute>
+                  <Quality />
+                </ProtectedRoute>
+              } 
+            />
+            {/* Placeholder routes for remaining modules */}
             {[
-              'registration', 'checkin', 'inpatient', 'ward', 'doctor', 'nurse',
-              'lab', 'inventory', 'accounts', 'cashier', 'insurance', 'claims',
-              'pharmacy', 'imaging', 'radiology', 'corporate', 'stores', 'hr',
-              'emr', 'theatre', 'emergency', 'obstetrics',
-              'patient-portal', 'telemedicine', 'feedback', 'compliance',
+              'inpatient', 'ward', 'inventory', 'accounts', 'cashier', 'insurance', 'claims',
+              'imaging', 'radiology', 'corporate', 'stores', 'hr',
+              'emr', 'theatre', 'obstetrics',
+              'patient-portal', 'telemedicine', 'feedback',
               'audit', 'backup', 'api'
             ].map(module => (
               <Route 
