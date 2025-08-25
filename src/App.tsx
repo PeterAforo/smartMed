@@ -17,6 +17,8 @@ import Quality from "./pages/Quality";
 import Settings from "./pages/Settings";
 import ClinicalWorkflow from "./pages/ClinicalWorkflow";
 import Mobile from "./pages/Mobile";
+import Operations from "./pages/Operations";
+import Finance from "./pages/Finance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -131,6 +133,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Mobile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operations" 
+              element={
+                <ProtectedRoute>
+                  <Operations />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/finance" 
+              element={
+                <ProtectedRoute>
+                  <Finance />
                 </ProtectedRoute>
               } 
             />
