@@ -234,12 +234,80 @@ export function useQueuePerformance(
 
 // Hook for combined analytics dashboard data
 export function useAnalyticsDashboard() {
+  const { tenant } = useAuth();
   const appointmentData = useAppointmentAnalytics();
   const revenueData = useRevenueAnalytics();
   const patientFlowData = usePatientFlowAnalytics();
   const staffPerformance = useStaffPerformance();
   const appointmentTypes = useAppointmentTypeDistribution();
   const queuePerformance = useQueuePerformance();
+
+  // If user is not authenticated, provide sample data for demonstration
+  if (!tenant) {
+    return {
+      appointments: { 
+        data: [{ 
+          date: format(new Date(), 'yyyy-MM-dd'),
+          completed_appointments: 15, 
+          total_appointments: 18,
+          no_show_appointments: 2,
+          cancelled_appointments: 1,
+          unique_patients: 14,
+          avg_duration: 35
+        }],
+        isLoading: false,
+        isError: false
+      },
+      revenue: { 
+        data: [{ 
+          month: format(new Date(), 'yyyy-MM-dd'),
+          total_revenue: 12500,
+          total_transactions: 24,
+          avg_transaction_amount: 520,
+          unique_patients: 18,
+          paid_revenue: 11200,
+          pending_revenue: 1300
+        }],
+        isLoading: false,
+        isError: false
+      },
+      patientFlow: { 
+        data: [{ 
+          month: format(new Date(), 'yyyy-MM-dd'),
+          new_patients: 8,
+          active_patients: 156,
+          pediatric_patients: 23,
+          senior_patients: 34
+        }],
+        isLoading: false,
+        isError: false
+      },
+      staffPerformance: {
+        data: [],
+        isLoading: false,
+        isError: false
+      },
+      appointmentTypes: {
+        data: [],
+        isLoading: false,
+        isError: false
+      },
+      queuePerformance: { 
+        data: [{ 
+          date: format(new Date(), 'yyyy-MM-dd'),
+          avg_wait_time: 1800,
+          total_queue_entries: 22,
+          max_wait_time: 3600,
+          completed_entries: 18,
+          no_show_entries: 2
+        }],
+        isLoading: false,
+        isError: false
+      },
+      isLoading: false,
+      isError: false,
+    };
+  }
 
   return {
     appointments: appointmentData,
