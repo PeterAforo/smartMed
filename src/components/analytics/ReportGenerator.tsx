@@ -36,7 +36,7 @@ export function ReportGenerator() {
   const { branches, hasCrossBranchAccess } = useAuth();
   const { toast } = useToast();
 
-  const handleGenerateReport = async (format: 'pdf' | 'html' = 'pdf') => {
+  const handleGenerateReport = async (reportFormat: 'pdf' | 'html' = 'pdf') => {
     if (!dateRange.from || !dateRange.to) {
       toast({
         title: "Invalid Date Range",
@@ -55,13 +55,13 @@ export function ReportGenerator() {
           endDate: format(dateRange.to, 'yyyy-MM-dd'),
           branchId: selectedBranch || undefined,
           includeCharts,
-          format
+          format: reportFormat
         }
       });
 
       if (error) throw error;
 
-      if (format === 'pdf') {
+      if (reportFormat === 'pdf') {
         // Open in new window for PDF generation via browser print
         const printWindow = window.open('', '_blank');
         if (printWindow) {
@@ -78,7 +78,7 @@ export function ReportGenerator() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `healthcare-report-${dateRange.from.toISOString().split('T')[0]}-${dateRange.to.toISOString().split('T')[0]}.html`;
+        a.download = `healthcare-report-${format(dateRange.from, 'yyyy-MM-dd')}-${format(dateRange.to, 'yyyy-MM-dd')}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -88,7 +88,7 @@ export function ReportGenerator() {
       setLastGenerated(new Date());
       toast({
         title: "Report Generated",
-        description: `${format.toUpperCase()} report has been generated successfully.`,
+        description: `${reportFormat.toUpperCase()} report has been generated successfully.`,
       });
     } catch (error) {
       console.error('Report generation error:', error);
