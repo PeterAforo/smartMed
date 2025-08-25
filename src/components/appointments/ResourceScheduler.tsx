@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
+import { useRealtimeRoomBookings } from "@/hooks/useRealtime"
 import { format, addMinutes, parseISO, isSameDay } from "date-fns"
 
 interface RoomBooking {
@@ -89,34 +90,7 @@ export default function ResourceScheduler() {
     appointment_id: ''
   })
 
-  const { data: bookings, isLoading } = useQuery({
-    queryKey: ['room-bookings', currentBranch?.id, format(selectedDate, 'yyyy-MM-dd')],
-    queryFn: async () => {
-      if (!currentBranch) return []
-      
-      const { data, error } = await supabase
-        .from('room_bookings')
-        .select(`
-          *,
-          appointments(
-            id,
-            appointment_type,
-            patients(
-              first_name,
-              last_name,
-              patient_number
-            )
-          )
-        `)
-        .eq('branch_id', currentBranch.id)
-        .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
-        .order('start_time')
-      
-      if (error) throw error
-      return data || []
-    },
-    enabled: !!currentBranch
-  })
+  const { data: bookings, loading: isLoading, refetch } = useRealtimeRoomBookings(selectedDate)
 
   const { data: availableAppointments } = useQuery({
     queryKey: ['available-appointments', currentBranch?.id, format(selectedDate, 'yyyy-MM-dd')],
@@ -187,7 +161,7 @@ export default function ResourceScheduler() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['room-bookings'] })
+      refetch()
       toast({
         title: "Room Booked",
         description: "Room booking created successfully"
@@ -218,7 +192,7 @@ export default function ResourceScheduler() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['room-bookings'] })
+      refetch()
       toast({
         title: "Booking Updated",
         description: "Room booking updated successfully"
@@ -238,7 +212,7 @@ export default function ResourceScheduler() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['room-bookings'] })
+      refetch()
     }
   })
 

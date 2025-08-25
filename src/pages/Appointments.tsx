@@ -16,8 +16,8 @@ import QueueDashboard from "@/components/appointments/QueueDashboard"
 import ResourceScheduler from "@/components/appointments/ResourceScheduler"
 import ReminderSettings from "@/components/appointments/ReminderSettings"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/integrations/supabase/client"
-import { useQuery } from "@tanstack/react-query"
+import { useRealtimeAppointments } from "@/hooks/useRealtime"
+import { NotificationProvider, NotificationToggle } from "@/components/notifications/NotificationProvider"
 import { format, isToday, isTomorrow, isYesterday, startOfDay, endOfDay } from "date-fns"
 
 export default function Appointments() {
@@ -29,33 +29,7 @@ export default function Appointments() {
   const [showRecurringDialog, setShowRecurringDialog] = useState(false)
   const [activeTab, setActiveTab] = useState("appointments")
 
-  const { data: appointments, isLoading, refetch } = useQuery({
-    queryKey: ['appointments', currentBranch?.id],
-    queryFn: async () => {
-      if (!currentBranch) return []
-      
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          patients!inner(
-            id,
-            first_name,
-            last_name,
-            patient_number,
-            phone,
-            email
-          )
-        `)
-        .eq('branch_id', currentBranch.id)
-        .order('appointment_date', { ascending: true })
-        .order('appointment_time', { ascending: true })
-      
-      if (error) throw error
-      return data || []
-    },
-    enabled: !!currentBranch
-  })
+  const { data: appointments, loading: isLoading, refetch } = useRealtimeAppointments()
 
   const filteredAppointments = appointments?.filter(appointment => {
     const matchesSearch = searchTerm === "" || 
@@ -132,8 +106,9 @@ export default function Appointments() {
   const completedAppointments = appointments?.filter(apt => apt.status === 'completed') || []
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <NotificationProvider>
+      <DashboardLayout>
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -141,6 +116,7 @@ export default function Appointments() {
             <p className="text-muted-foreground">Comprehensive appointment management system</p>
           </div>
           <div className="flex items-center gap-2">
+            <NotificationToggle />
             <Button 
               variant="outline" 
               onClick={() => setShowRecurringDialog(true)} 
@@ -389,7 +365,8 @@ export default function Appointments() {
           open={showRecurringDialog}
           onOpenChange={setShowRecurringDialog}
         />
-      </div>
-    </DashboardLayout>
+        </div>
+      </DashboardLayout>
+    </NotificationProvider>
   )
 }

@@ -7,8 +7,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
+import { useRealtimeQueue } from "@/hooks/useRealtime"
 import { format, isToday, differenceInMinutes } from "date-fns"
 
 interface QueueItem {
@@ -40,38 +41,7 @@ export default function QueueDashboard() {
   const queryClient = useQueryClient()
   const [selectedDate, setSelectedDate] = useState(new Date())
 
-  const { data: queueData, isLoading } = useQuery({
-    queryKey: ['appointment-queue', currentBranch?.id, format(selectedDate, 'yyyy-MM-dd')],
-    queryFn: async () => {
-      if (!currentBranch) return []
-      
-      const { data, error } = await supabase
-        .from('appointment_queue')
-        .select(`
-          *,
-          appointments!inner(
-            id,
-            appointment_time,
-            appointment_type,
-            duration_minutes,
-            patients!inner(
-              id,
-              first_name,
-              last_name,
-              patient_number
-            )
-          )
-        `)
-        .eq('branch_id', currentBranch.id)
-        .eq('queue_date', format(selectedDate, 'yyyy-MM-dd'))
-        .order('queue_position')
-      
-      if (error) throw error
-      return data || []
-    },
-    enabled: !!currentBranch,
-    refetchInterval: 30000 // Refresh every 30 seconds
-  })
+  const { data: queueData, loading: isLoading, refetch } = useRealtimeQueue(selectedDate)
 
   const updateQueueStatusMutation = useMutation({
     mutationFn: async ({ queueId, status, appointmentId }: { 
@@ -104,7 +74,7 @@ export default function QueueDashboard() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointment-queue'] })
+      refetch()
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
     }
   })
@@ -158,7 +128,7 @@ export default function QueueDashboard() {
         .eq('id', appointmentId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointment-queue'] })
+      refetch()
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
       toast({
         title: "Patient Checked In",
