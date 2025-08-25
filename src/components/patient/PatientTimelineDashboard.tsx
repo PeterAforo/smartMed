@@ -235,17 +235,17 @@ export const PatientTimelineDashboard: React.FC<PatientTimelineDashboardProps> =
                             </span>
                           </div>
                         </div>
-                        {event.type === 'medical_record' && (
+                        {event.type === 'medical_record' && 'description' in event && (
                           <p className="text-sm text-muted-foreground mt-1">
                             {event.description || 'No description available'}
                           </p>
                         )}
-                        {event.type === 'prescription' && (
+                        {event.type === 'prescription' && 'dosage' in event && 'frequency' in event && (
                           <p className="text-sm text-muted-foreground mt-1">
                             {event.dosage} - {event.frequency}
                           </p>
                         )}
-                        {event.type === 'appointment' && (
+                        {event.type === 'appointment' && 'notes' in event && (
                           <p className="text-sm text-muted-foreground mt-1">
                             {event.notes || 'No notes available'}
                           </p>

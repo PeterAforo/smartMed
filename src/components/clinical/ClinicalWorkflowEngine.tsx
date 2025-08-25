@@ -16,6 +16,52 @@ interface ClinicalWorkflowEngineProps {
   patientId?: string;
 }
 
+interface WorkflowInstanceWithRelations {
+  id: string;
+  workflow_id: string;
+  patient_id: string;
+  status: string;
+  priority: number;
+  current_step: number;
+  started_at: string;
+  workflow?: {
+    id: string;
+    workflow_name: string;
+    workflow_type: string;
+    steps: any[];
+  };
+  patient?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    patient_number: string;
+  };
+}
+
+interface WorkflowTaskWithRelations {
+  id: string;
+  task_name: string;
+  description: string;
+  status: string;
+  due_date?: string;
+  workflow_instance_id: string;
+  workflow_instance?: {
+    id: string;
+    workflow_id: string;
+    patient_id: string;
+    workflow?: {
+      id: string;
+      workflow_name: string;
+    };
+    patient?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+      patient_number: string;
+    };
+  };
+}
+
 export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patientId }) => {
   const { profile, currentBranch } = useAuth();
   const { toast } = useToast();
@@ -45,11 +91,7 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
     queryFn: async () => {
       let query = supabase
         .from('workflow_instances')
-        .select(`
-          *,
-          workflow:clinical_workflows(workflow_name, workflow_type),
-          patient:patients(first_name, last_name, patient_number)
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .in('status', ['active', 'paused'])
         .order('created_at', { ascending: false });
@@ -62,9 +104,27 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
         query = query.eq('branch_id', currentBranch.id);
       }
 
-      const { data, error } = await query;
+      const { data: instances, error } = await query;
       if (error) throw error;
-      return data;
+
+      // Fetch related data separately
+      if (instances && instances.length > 0) {
+        const workflowIds = [...new Set(instances.map(i => i.workflow_id))];
+        const patientIds = [...new Set(instances.map(i => i.patient_id))];
+
+        const [workflowsData, patientsData] = await Promise.all([
+          supabase.from('clinical_workflows').select('id, workflow_name, workflow_type, steps').in('id', workflowIds),
+          supabase.from('patients').select('id, first_name, last_name, patient_number').in('id', patientIds)
+        ]);
+
+        return instances.map(instance => ({
+          ...instance,
+          workflow: workflowsData.data?.find(w => w.id === instance.workflow_id),
+          patient: patientsData.data?.find(p => p.id === instance.patient_id)
+        })) as WorkflowInstanceWithRelations[];
+      }
+
+      return instances || [];
     },
     enabled: !!profile?.tenant_id
   });
@@ -73,21 +133,48 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
   const { data: workflowTasks } = useQuery({
     queryKey: ['workflow-tasks', currentBranch?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: tasks, error } = await supabase
         .from('workflow_tasks')
-        .select(`
-          *,
-          workflow_instance:workflow_instances(
-            patient:patients(first_name, last_name, patient_number),
-            workflow:clinical_workflows(workflow_name)
-          )
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .in('status', ['pending', 'in_progress'])
         .order('due_date', { ascending: true });
       
       if (error) throw error;
-      return data;
+
+      // Fetch related data separately
+      if (tasks && tasks.length > 0) {
+        const instanceIds = [...new Set(tasks.map(t => t.workflow_instance_id))];
+        
+        const { data: instances } = await supabase
+          .from('workflow_instances')
+          .select('id, workflow_id, patient_id')
+          .in('id', instanceIds);
+
+        if (instances && instances.length > 0) {
+          const workflowIds = [...new Set(instances.map(i => i.workflow_id))];
+          const patientIds = [...new Set(instances.map(i => i.patient_id))];
+
+          const [workflowsData, patientsData] = await Promise.all([
+            supabase.from('clinical_workflows').select('id, workflow_name').in('id', workflowIds),
+            supabase.from('patients').select('id, first_name, last_name, patient_number').in('id', patientIds)
+          ]);
+
+          return tasks.map(task => {
+            const instance = instances.find(i => i.id === task.workflow_instance_id);
+            return {
+              ...task,
+              workflow_instance: {
+                ...instance,
+                workflow: workflowsData.data?.find(w => w.id === instance?.workflow_id),
+                patient: patientsData.data?.find(p => p.id === instance?.patient_id)
+              }
+            };
+          }) as WorkflowTaskWithRelations[];
+        }
+      }
+
+      return tasks || [];
     },
     enabled: !!profile?.tenant_id
   });
@@ -199,8 +286,8 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
     return 'secondary';
   };
 
-  const calculateProgress = (instance: any) => {
-    if (!instance.workflow?.steps) return 0;
+  const calculateProgress = (instance: WorkflowInstanceWithRelations) => {
+    if (!instance.workflow?.steps || !Array.isArray(instance.workflow.steps)) return 0;
     const totalSteps = instance.workflow.steps.length;
     const currentStep = instance.current_step || 0;
     return Math.round((currentStep / totalSteps) * 100);
@@ -407,7 +494,7 @@ export const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ 
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-muted-foreground">
-                        {workflow.steps?.length || 0} steps
+                        {Array.isArray(workflow.steps) ? workflow.steps.length : 0} steps
                       </div>
                       <Button
                         size="sm"

@@ -14,6 +14,8 @@ import { NewPatientModal } from "@/components/dashboard/modals/NewPatientModal"
 import { MedicalRecordsTab } from "@/components/patient/MedicalRecordsTab"
 import { PrescriptionsTab } from "@/components/patient/PrescriptionsTab"
 import { VitalSignsTab } from "@/components/patient/VitalSignsTab"
+import { PatientTimelineDashboard } from "@/components/patient/PatientTimelineDashboard"
+import { MedicalHistoryTracker } from "@/components/patient/MedicalHistoryTracker"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery } from "@tanstack/react-query"
@@ -270,13 +272,15 @@ export default function Patients() {
             </DialogHeader>
             {selectedPatient && (
               <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-6">
+                <TabsList className="grid w-full grid-cols-8">
                   <TabsTrigger value="general">General</TabsTrigger>
                   <TabsTrigger value="medical">Medical</TabsTrigger>
                   <TabsTrigger value="records">Records</TabsTrigger>
                   <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
                   <TabsTrigger value="vitals">Vital Signs</TabsTrigger>
                   <TabsTrigger value="history">History</TabsTrigger>
+                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                  <TabsTrigger value="enhanced">Enhanced</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="general" className="space-y-4">
@@ -356,6 +360,14 @@ export default function Patients() {
                       </Badge>
                     </div>
                   </div>
+                </TabsContent>
+
+                <TabsContent value="timeline" className="space-y-4">
+                  <PatientTimelineDashboard patientId={selectedPatient.id} />
+                </TabsContent>
+
+                <TabsContent value="enhanced" className="space-y-4">
+                  <MedicalHistoryTracker patientId={selectedPatient.id} />
                 </TabsContent>
               </Tabs>
             )}
