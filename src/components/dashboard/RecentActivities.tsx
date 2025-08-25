@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRecentActivities } from "@/hooks/useDashboardData";
+import { useRealtimeActivities } from "@/hooks/useRealtime";
 import { 
   User, 
   Calendar, 
@@ -66,7 +66,8 @@ function getActivityColor(activityType: string) {
 }
 
 export default function RecentActivities() {
-  const { data: activities, isLoading, error } = useRecentActivities();
+  const { data: activities, loading: isLoading } = useRealtimeActivities();
+  const error = null; // Real-time hook handles errors internally
 
   if (isLoading) {
     return (
