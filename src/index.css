@@ -2,41 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* NCHS Healthcare Management System Design System
+   Medical-focused color palette with professional gradients and animations.
+   All colors MUST be HSL for consistency and theming support.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core healthcare color palette */
+    --background: 240 10% 98%;
+    --foreground: 222 25% 12%;
 
+    /* Medical primary - Professional blue */
+    --primary: 214 88% 27%;
+    --primary-hover: 214 88% 23%;
+    --primary-light: 214 70% 92%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Healthcare secondary - Clean mint */
+    --secondary: 159 42% 94%;
+    --secondary-hover: 159 42% 88%;
+    --secondary-foreground: 159 42% 25%;
+
+    /* Success - Medical green */
+    --success: 142 69% 35%;
+    --success-light: 142 69% 95%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Medical amber */
+    --warning: 38 92% 50%;
+    --warning-light: 38 92% 95%;
+    --warning-foreground: 38 92% 15%;
+
+    /* Error - Medical red */
+    --destructive: 0 84% 60%;
+    --destructive-light: 0 84% 95%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Card and surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-hover: 214 32% 98%;
+    --card-foreground: 222 25% 12%;
 
+    /* Interactive elements */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 25% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Muted and accents */
+    --muted: 214 32% 96%;
+    --muted-foreground: 215 25% 45%;
+    --accent: 214 32% 94%;
+    --accent-foreground: 214 88% 27%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Borders and inputs */
+    --border: 214 32% 91%;
+    --input: 214 32% 93%;
+    --ring: 214 88% 27%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Medical gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(214 88% 27%), hsl(214 88% 35%));
+    --gradient-success: linear-gradient(135deg, hsl(142 69% 35%), hsl(142 69% 45%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(214 32% 98%));
+    --gradient-header: linear-gradient(135deg, hsl(214 88% 27%), hsl(214 88% 20%));
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Healthcare shadows */
+    --shadow-card: 0 2px 8px hsl(214 25% 25% / 0.08);
+    --shadow-hover: 0 4px 16px hsl(214 25% 25% / 0.12);
+    --shadow-focus: 0 0 0 3px hsl(214 88% 27% / 0.2);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +94,58 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode healthcare palette */
+    --background: 222 25% 6%;
+    --foreground: 214 32% 91%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Dark primary - Lighter medical blue */
+    --primary: 214 88% 65%;
+    --primary-hover: 214 88% 70%;
+    --primary-light: 214 70% 15%;
+    --primary-foreground: 222 25% 6%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    /* Dark secondary */
+    --secondary: 217 33% 17%;
+    --secondary-hover: 217 33% 22%;
+    --secondary-foreground: 214 32% 91%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Dark success */
+    --success: 142 69% 55%;
+    --success-light: 142 69% 12%;
+    --success-foreground: 222 25% 6%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Dark warning */
+    --warning: 38 92% 65%;
+    --warning-light: 38 92% 12%;
+    --warning-foreground: 222 25% 6%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Dark error */
+    --destructive: 0 84% 65%;
+    --destructive-light: 0 84% 12%;
+    --destructive-foreground: 222 25% 6%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Dark surfaces */
+    --card: 217 33% 10%;
+    --card-hover: 217 33% 15%;
+    --card-foreground: 214 32% 91%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --popover: 217 33% 10%;
+    --popover-foreground: 214 32% 91%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 20%;
+    --accent-foreground: 214 88% 65%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 17%;
+    --ring: 214 88% 65%;
+
+    /* Dark gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(214 88% 45%), hsl(214 88% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(142 69% 45%), hsl(142 69% 55%));
+    --gradient-card: linear-gradient(135deg, hsl(217 33% 10%), hsl(217 33% 15%));
+    --gradient-header: linear-gradient(135deg, hsl(214 88% 35%), hsl(214 88% 25%));
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +163,70 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Healthcare-specific base styles */
+  .healthcare-card {
+    @apply bg-card border border-border rounded-lg shadow-sm;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+  }
+
+  .healthcare-card:hover {
+    box-shadow: var(--shadow-hover);
+    @apply border-primary/20;
+  }
+
+  .healthcare-gradient {
+    background: var(--gradient-primary);
+  }
+
+  .healthcare-gradient-success {
+    background: var(--gradient-success);
+  }
+
+  .healthcare-gradient-card {
+    background: var(--gradient-card);
+  }
+}
+
+@layer components {
+  /* Medical status indicators */
+  .status-critical {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
+  }
+
+  .status-warning {
+    @apply bg-warning/10 text-warning-foreground border-warning/20;
+  }
+
+  .status-normal {
+    @apply bg-success/10 text-success-foreground border-success/20;
+  }
+
+  /* Healthcare metrics cards */
+  .metric-card {
+    @apply healthcare-card p-6 space-y-2;
+  }
+
+  .metric-value {
+    @apply text-2xl font-bold text-foreground;
+  }
+
+  .metric-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  .metric-change {
+    @apply text-xs font-medium;
+  }
+
+  .metric-change.positive {
+    @apply text-success;
+  }
+
+  .metric-change.negative {
+    @apply text-destructive;
   }
 }
