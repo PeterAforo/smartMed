@@ -5,12 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Video, Phone, Monitor, Users, Calendar, Clock, Search, Plus, Camera, Mic } from 'lucide-react';
+import { Video, Phone, Monitor, Users, Calendar, Clock, Search, Plus, Camera, Mic, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ScheduleVirtualVisitDialog } from '@/components/telemedicine/ScheduleVirtualVisitDialog';
+import { RescheduleDialog } from '@/components/telemedicine/RescheduleDialog';
+import { AppointmentDetailsDialog } from '@/components/telemedicine/AppointmentDetailsDialog';
+import { TelehealthAnalytics } from '@/components/telemedicine/TelehealthAnalytics';
 
 const Telemedicine = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Dialog states
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
   // Mock data for virtual appointments
   const [virtualAppointments] = useState([
@@ -110,6 +120,11 @@ const Telemedicine = () => {
   };
 
   const handleJoinSession = (appointmentId: number) => {
+    const appointment = virtualAppointments.find(app => app.id === appointmentId);
+    if (appointment?.platform === 'video' && appointment.roomId) {
+      // Simulate opening video call
+      window.open(`https://meet.example.com/${appointment.roomId}`, '_blank');
+    }
     toast({
       title: "Joining Session",
       description: "Connecting to telemedicine session...",
@@ -117,6 +132,11 @@ const Telemedicine = () => {
   };
 
   const handleStartSession = (appointmentId: number) => {
+    const appointment = virtualAppointments.find(app => app.id === appointmentId);
+    if (appointment) {
+      // Update appointment status to in-progress
+      appointment.status = 'in-progress';
+    }
     toast({
       title: "Session Started",
       description: "Telemedicine session is now active.",
@@ -128,6 +148,16 @@ const Telemedicine = () => {
       title: "Session Ended",
       description: "Telemedicine session completed successfully.",
     });
+  };
+
+  const handleReschedule = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setShowRescheduleDialog(true);
+  };
+
+  const handleViewDetails = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setShowDetailsDialog(true);
   };
 
   const filteredAppointments = virtualAppointments.filter(appointment =>
@@ -246,7 +276,7 @@ const Telemedicine = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
-                  <Button>
+                  <Button onClick={() => setShowScheduleDialog(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Schedule Virtual Visit
                   </Button>
@@ -289,10 +319,10 @@ const Telemedicine = () => {
                             Join Session
                           </Button>
                         )}
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => handleReschedule(appointment)}>
                           Reschedule
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => handleViewDetails(appointment)}>
                           Details
                         </Button>
                       </div>
@@ -430,44 +460,27 @@ const Telemedicine = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Telemedicine Analytics</CardTitle>
-                <CardDescription>
-                  Performance metrics and usage statistics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Video className="h-6 w-6 mb-2" />
-                    Session Analytics
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Users className="h-6 w-6 mb-2" />
-                    Patient Usage Report
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Monitor className="h-6 w-6 mb-2" />
-                    Platform Performance
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Clock className="h-6 w-6 mb-2" />
-                    Wait Time Analysis
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Camera className="h-6 w-6 mb-2" />
-                    Quality Metrics
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col">
-                    <Mic className="h-6 w-6 mb-2" />
-                    Technical Issues Report
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <TelehealthAnalytics />
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <ScheduleVirtualVisitDialog
+          open={showScheduleDialog}
+          onOpenChange={setShowScheduleDialog}
+        />
+        
+        <RescheduleDialog
+          open={showRescheduleDialog}
+          onOpenChange={setShowRescheduleDialog}
+          appointment={selectedAppointment}
+        />
+        
+        <AppointmentDetailsDialog
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+          appointment={selectedAppointment}
+        />
       </div>
     </DashboardLayout>
   );
