@@ -11,6 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import { NewPatientModal } from "@/components/dashboard/modals/NewPatientModal"
+import { MedicalRecordsTab } from "@/components/patient/MedicalRecordsTab"
+import { PrescriptionsTab } from "@/components/patient/PrescriptionsTab"
+import { VitalSignsTab } from "@/components/patient/VitalSignsTab"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery } from "@tanstack/react-query"
@@ -267,10 +270,12 @@ export default function Patients() {
             </DialogHeader>
             {selectedPatient && (
               <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="general">General</TabsTrigger>
                   <TabsTrigger value="medical">Medical</TabsTrigger>
-                  <TabsTrigger value="insurance">Insurance</TabsTrigger>
+                  <TabsTrigger value="records">Records</TabsTrigger>
+                  <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+                  <TabsTrigger value="vitals">Vital Signs</TabsTrigger>
                   <TabsTrigger value="history">History</TabsTrigger>
                 </TabsList>
                 
@@ -322,11 +327,16 @@ export default function Patients() {
                   </div>
                 </TabsContent>
                 
-                <TabsContent value="insurance" className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Insurance Information</label>
-                    <p className="text-sm">{JSON.stringify(selectedPatient.insurance_info) !== '{}' ? 'Insurance details available' : 'No insurance information on file'}</p>
-                  </div>
+                <TabsContent value="records" className="space-y-4">
+                  <MedicalRecordsTab patientId={selectedPatient.id} />
+                </TabsContent>
+
+                <TabsContent value="prescriptions" className="space-y-4">
+                  <PrescriptionsTab patientId={selectedPatient.id} />
+                </TabsContent>
+
+                <TabsContent value="vitals" className="space-y-4">
+                  <VitalSignsTab patientId={selectedPatient.id} />
                 </TabsContent>
                 
                 <TabsContent value="history" className="space-y-4">
