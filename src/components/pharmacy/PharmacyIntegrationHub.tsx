@@ -32,30 +32,19 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
         .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .in('status', ['active', 'pending'])
-        .order('created_at', { ascending: false });
+        .order('start_date', { ascending: false });
 
       if (patientId) {
         query = query.eq('patient_id', patientId);
       }
 
-      const { data: prescriptionData, error } = await query;
-      if (error) throw error;
-
-      // Fetch patient data separately
-      if (prescriptionData && prescriptionData.length > 0) {
-        const patientIds = [...new Set(prescriptionData.map(p => p.patient_id))];
-        const { data: patientData } = await supabase
-          .from('patients')
-          .select('id, first_name, last_name, patient_number')
-          .in('id', patientIds);
-
-        return prescriptionData.map(prescription => ({
-          ...prescription,
-          patients: patientData?.find(p => p.id === prescription.patient_id)
-        }));
+      if (currentBranch?.id) {
+        query = query.eq('branch_id', currentBranch.id);
       }
 
-      return prescriptionData || [];
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
     },
     enabled: !!profile?.tenant_id
   });
@@ -81,33 +70,23 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
   const { data: renewals } = useQuery({
     queryKey: ['prescription-renewals', currentBranch?.id],
     queryFn: async () => {
-      const { data: renewalData, error } = await supabase
+      let query = supabase
         .from('prescription_renewals')
         .select('*')
         .eq('tenant_id', profile?.tenant_id)
-        .in('status', ['pending', 'approved'])
         .order('request_date', { ascending: false });
-      
-      if (error) throw error;
 
-      // Fetch related data separately
-      if (renewalData && renewalData.length > 0) {
-        const prescriptionIds = [...new Set(renewalData.map(r => r.original_prescription_id))];
-        const patientIds = [...new Set(renewalData.map(r => r.patient_id))];
-
-        const [prescriptionData, patientData] = await Promise.all([
-          supabase.from('prescriptions').select('id, medication_name, dosage').in('id', prescriptionIds),
-          supabase.from('patients').select('id, first_name, last_name, patient_number').in('id', patientIds)
-        ]);
-
-        return renewalData.map(renewal => ({
-          ...renewal,
-          prescriptions: prescriptionData.data?.find(p => p.id === renewal.original_prescription_id),
-          patients: patientData.data?.find(p => p.id === renewal.patient_id)
-        }));
+      if (patientId) {
+        query = query.eq('patient_id', patientId);
       }
 
-      return renewalData || [];
+      if (currentBranch?.id) {
+        query = query.eq('branch_id', currentBranch.id);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
     },
     enabled: !!profile?.tenant_id
   });
@@ -116,36 +95,49 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
   const { data: adherenceData } = useQuery({
     queryKey: ['medication-adherence', patientId],
     queryFn: async () => {
-      if (!patientId) return [];
-      
-      const { data: adherenceDataRaw, error } = await supabase
+      let query = supabase
         .from('medication_adherence')
         .select('*')
-        .eq('patient_id', patientId)
         .eq('tenant_id', profile?.tenant_id)
-        .gte('adherence_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
         .order('adherence_date', { ascending: false });
-      
-      if (error) throw error;
 
-      // Fetch prescription data separately
-      if (adherenceDataRaw && adherenceDataRaw.length > 0) {
-        const prescriptionIds = [...new Set(adherenceDataRaw.map(a => a.prescription_id))];
-        const { data: prescriptionData } = await supabase
-          .from('prescriptions')
-          .select('id, medication_name, dosage, frequency')
-          .in('id', prescriptionIds);
-
-        return adherenceDataRaw.map(adherence => ({
-          ...adherence,
-          prescriptions: prescriptionData?.find(p => p.id === adherence.prescription_id)
-        }));
+      if (patientId) {
+        query = query.eq('patient_id', patientId);
       }
 
-      return adherenceDataRaw || [];
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
     },
-    enabled: !!patientId && !!profile?.tenant_id
+    enabled: !!profile?.tenant_id
   });
+
+  // Fetch patients data  
+  const { data: patients } = useQuery({
+    queryKey: ['patients', profile?.tenant_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, first_name, last_name, patient_number')
+        .eq('tenant_id', profile?.tenant_id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!profile?.tenant_id
+  });
+
+  // Create patient lookup map
+  const patientMap = patients?.reduce((acc, patient) => {
+    acc[patient.id] = patient;
+    return acc;
+  }, {} as Record<string, any>) || {};
+
+  // Create prescription lookup map
+  const prescriptionMap = prescriptions?.reduce((acc, prescription) => {
+    acc[prescription.id] = prescription;
+    return acc;
+  }, {} as Record<string, any>) || {};
 
   // Check for drug interactions
   const checkInteractions = (medications: string[]) => {
@@ -213,8 +205,8 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
 
   const filteredPrescriptions = prescriptions?.filter(prescription =>
     prescription.medication_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prescription.patients?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prescription.patients?.last_name.toLowerCase().includes(searchTerm.toLowerCase())
+    patientMap[prescription.patient_id]?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patientMap[prescription.patient_id]?.last_name.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const selectedMedications = prescriptions
@@ -309,8 +301,8 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
                             <div className="text-sm text-muted-foreground space-y-1">
                               <p><strong>Dosage:</strong> {prescription.dosage}</p>
                               <p><strong>Frequency:</strong> {prescription.frequency}</p>
-                              {prescription.patients && (
-                                <p><strong>Patient:</strong> {prescription.patients.first_name} {prescription.patients.last_name}</p>
+                              {patientMap[prescription.patient_id] && (
+                                <p><strong>Patient:</strong> {patientMap[prescription.patient_id].first_name} {patientMap[prescription.patient_id].last_name}</p>
                               )}
                               <p><strong>Start Date:</strong> {format(new Date(prescription.start_date), 'MMM dd, yyyy')}</p>
                               {prescription.end_date && (
@@ -388,7 +380,7 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
                   <div key={renewal.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">
-                        {renewal.prescriptions?.medication_name} - {renewal.prescriptions?.dosage}
+                        {prescriptionMap[renewal.original_prescription_id]?.medication_name || 'Unknown Medication'}
                       </h4>
                       <div className="flex items-center gap-2">
                         <Badge variant={renewal.status === 'approved' ? 'default' : 'secondary'}>
@@ -400,8 +392,8 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-1">
-                      {renewal.patients && (
-                        <p><strong>Patient:</strong> {renewal.patients.first_name} {renewal.patients.last_name}</p>
+                      {patientMap[renewal.patient_id] && (
+                        <p><strong>Patient:</strong> {patientMap[renewal.patient_id].first_name} {patientMap[renewal.patient_id].last_name}</p>
                       )}
                       <p><strong>Requested:</strong> {format(new Date(renewal.request_date), 'MMM dd, yyyy')}</p>
                       {renewal.approval_date && (
@@ -450,7 +442,7 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
                     <div key={adherence.id} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium">
-                          {adherence.prescriptions?.medication_name}
+                          {prescriptionMap[adherence.prescription_id]?.medication_name || 'Unknown Medication'}
                         </h4>
                         <div className="flex items-center gap-2">
                           <span className={`font-medium ${getAdherenceColor(adherence.adherence_percentage)}`}>
@@ -462,7 +454,7 @@ export const PharmacyIntegrationHub: React.FC<PharmacyIntegrationHubProps> = ({ 
                         </div>
                       </div>
                       <div className="text-sm text-muted-foreground space-y-1">
-                        <p><strong>Dosage:</strong> {adherence.prescriptions?.dosage}</p>
+                        <p><strong>Dosage:</strong> {prescriptionMap[adherence.prescription_id]?.dosage || 'Unknown'}</p>
                         <p><strong>Prescribed:</strong> {adherence.doses_prescribed} doses</p>
                         <p><strong>Taken:</strong> {adherence.doses_taken} doses</p>
                         <p><strong>Missed:</strong> {adherence.missed_doses} doses</p>

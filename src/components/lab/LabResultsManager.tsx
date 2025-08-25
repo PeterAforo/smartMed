@@ -32,10 +32,7 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
     queryFn: async () => {
       let query = supabase
         .from('lab_orders')
-        .select(`
-          *,
-          patients(first_name, last_name, patient_number)
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .order('order_date', { ascending: false });
 
@@ -60,10 +57,7 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
     queryFn: async () => {
       let query = supabase
         .from('lab_results')
-        .select(`
-          *,
-          patients(first_name, last_name, patient_number)
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .order('ordered_at', { ascending: false });
 
@@ -81,6 +75,27 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
     },
     enabled: !!profile?.tenant_id
   });
+
+  // Fetch patients data
+  const { data: patients } = useQuery({
+    queryKey: ['patients', profile?.tenant_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, first_name, last_name, patient_number')
+        .eq('tenant_id', profile?.tenant_id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!profile?.tenant_id
+  });
+
+  // Create patient lookup map
+  const patientMap = patients?.reduce((acc, patient) => {
+    acc[patient.id] = patient;
+    return acc;
+  }, {} as Record<string, any>) || {};
 
   // Update order status mutation
   const updateOrderStatusMutation = useMutation({
@@ -193,8 +208,8 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
               {criticalResults.slice(0, 3).map((result) => (
                 <div key={result.id} className="text-sm">
                   <span className="font-medium">{result.test_name}</span>
-                  {result.patients && (
-                    <span className="text-muted-foreground"> - {result.patients.first_name} {result.patients.last_name}</span>
+                  {patientMap[result.patient_id] && (
+                    <span className="text-muted-foreground"> - {patientMap[result.patient_id].first_name} {patientMap[result.patient_id].last_name}</span>
                   )}
                 </div>
               ))}
@@ -241,9 +256,9 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h4 className="font-medium">Order #{order.order_number}</h4>
-                          {order.patients && (
+                          {patientMap[order.patient_id] && (
                             <p className="text-sm text-muted-foreground">
-                              {order.patients.first_name} {order.patients.last_name} ({order.patients.patient_number})
+                              {patientMap[order.patient_id].first_name} {patientMap[order.patient_id].last_name} ({patientMap[order.patient_id].patient_number})
                             </p>
                           )}
                         </div>
@@ -353,9 +368,9 @@ export const LabResultsManager: React.FC<LabResultsManagerProps> = ({ patientId 
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h4 className="font-medium">{result.test_name}</h4>
-                          {result.patients && (
+                          {patientMap[result.patient_id] && (
                             <p className="text-sm text-muted-foreground">
-                              {result.patients.first_name} {result.patients.last_name}
+                              {patientMap[result.patient_id].first_name} {patientMap[result.patient_id].last_name}
                             </p>
                           )}
                         </div>

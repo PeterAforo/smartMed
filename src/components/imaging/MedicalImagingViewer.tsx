@@ -30,10 +30,7 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
     queryFn: async () => {
       let query = supabase
         .from('imaging_studies')
-        .select(`
-          *,
-          patients(first_name, last_name, patient_number)
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .order('study_date', { ascending: false });
 
@@ -58,10 +55,7 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
     queryFn: async () => {
       let query = supabase
         .from('imaging_orders')
-        .select(`
-          *,
-          patients(first_name, last_name, patient_number)
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .order('order_date', { ascending: false });
 
@@ -86,14 +80,7 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
     queryFn: async () => {
       const { data, error } = await supabase
         .from('imaging_reports')
-        .select(`
-          *,
-          imaging_studies(
-            study_type,
-            body_part,
-            patients(first_name, last_name, patient_number)
-          )
-        `)
+        .select('*')
         .eq('tenant_id', profile?.tenant_id)
         .order('dictated_date', { ascending: false });
       
@@ -102,6 +89,27 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
     },
     enabled: !!profile?.tenant_id
   });
+
+  // Fetch patients data
+  const { data: patients } = useQuery({
+    queryKey: ['patients', profile?.tenant_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, first_name, last_name, patient_number')
+        .eq('tenant_id', profile?.tenant_id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!profile?.tenant_id
+  });
+
+  // Create patient lookup map
+  const patientMap = patients?.reduce((acc, patient) => {
+    acc[patient.id] = patient;
+    return acc;
+  }, {} as Record<string, any>) || {};
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -137,8 +145,8 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
     const matchesSearch = searchTerm === '' || 
       study.body_part.toLowerCase().includes(searchTerm.toLowerCase()) ||
       study.indication.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      study.patients?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      study.patients?.last_name.toLowerCase().includes(searchTerm.toLowerCase());
+      patientMap[study.patient_id]?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patientMap[study.patient_id]?.last_name.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesType = studyTypeFilter === 'all' || study.study_type === studyTypeFilter;
     const matchesStatus = statusFilter === 'all' || study.status === statusFilter;
@@ -231,9 +239,9 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
                           <h4 className="font-medium">
                             {studyTypes.find(t => t.value === study.study_type)?.label} - {study.body_part}
                           </h4>
-                          {study.patients && (
+                          {patientMap[study.patient_id] && (
                             <p className="text-sm text-muted-foreground">
-                              {study.patients.first_name} {study.patients.last_name} ({study.patients.patient_number})
+                              {patientMap[study.patient_id].first_name} {patientMap[study.patient_id].last_name} ({patientMap[study.patient_id].patient_number})
                             </p>
                           )}
                         </div>
@@ -321,9 +329,9 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h4 className="font-medium">Order #{order.order_number}</h4>
-                          {order.patients && (
+                          {patientMap[order.patient_id] && (
                             <p className="text-sm text-muted-foreground">
-                              {order.patients.first_name} {order.patients.last_name}
+                              {patientMap[order.patient_id].first_name} {patientMap[order.patient_id].last_name}
                             </p>
                           )}
                         </div>
@@ -374,14 +382,12 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
                 {imagingReports?.map((report) => (
                   <div key={report.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h4 className="font-medium">Report #{report.report_number}</h4>
-                        {report.imaging_studies?.patients && (
+                        <div>
+                          <h4 className="font-medium">Report #{report.report_number}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {report.imaging_studies.patients.first_name} {report.imaging_studies.patients.last_name}
+                            Study ID: {report.imaging_study_id}
                           </p>
-                        )}
-                      </div>
+                        </div>
                       <div className="flex items-center gap-2">
                         <Badge variant={getReportStatusBadgeVariant(report.report_status)}>
                           {report.report_status}
@@ -393,11 +399,7 @@ export const MedicalImagingViewer: React.FC<MedicalImagingViewerProps> = ({ pati
                     </div>
 
                     <div className="text-sm text-muted-foreground space-y-1 mb-3">
-                      {report.imaging_studies && (
-                        <>
-                          <p><strong>Study:</strong> {report.imaging_studies.study_type} - {report.imaging_studies.body_part}</p>
-                        </>
-                      )}
+                      <p><strong>Study ID:</strong> {report.imaging_study_id}</p>
                       {report.dictated_date && (
                         <p><strong>Dictated:</strong> {format(new Date(report.dictated_date), 'MMM dd, yyyy')}</p>
                       )}
