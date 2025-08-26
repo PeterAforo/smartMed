@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Siren, Clock, AlertTriangle, Activity, Users, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AssignBedDialog } from '@/components/emergency/AssignBedDialog';
 
 const Emergency = () => {
   const { toast } = useToast();
+  const [assignBedDialog, setAssignBedDialog] = useState<{open: boolean, patient: any}>({open: false, patient: null});
   
   const [emergencyQueue] = useState([
     {
@@ -111,10 +113,35 @@ const Emergency = () => {
     }
   };
 
-  const handleAssignBed = (patientId: string) => {
+  const handleAssignBed = (patient: any) => {
+    setAssignBedDialog({open: true, patient});
+  };
+
+  const handleViewChart = (patientId: string) => {
     toast({
-      title: "Bed Assigned",
-      description: `Patient ${patientId} has been assigned to an available bed.`
+      title: "Patient Chart",
+      description: `Opening medical chart for patient ${patientId}.`
+    });
+  };
+
+  const handleAssignPatientToBed = (bedId: string) => {
+    toast({
+      title: "Patient Assigned",
+      description: `Patient has been assigned to bed ${bedId}.`
+    });
+  };
+
+  const handleAssignPatientToStaff = (staffName: string) => {
+    toast({
+      title: "Patient Assigned",
+      description: `Patient has been assigned to ${staffName}.`
+    });
+  };
+
+  const handleGenerateReport = (reportType: string) => {
+    toast({
+      title: "Report Generated",
+      description: `${reportType} has been generated successfully.`
     });
   };
 
@@ -238,10 +265,10 @@ const Emergency = () => {
                           <Button size="sm" onClick={() => handleUpdateTriage(patient.patientId)}>
                             Update Triage
                           </Button>
-                          <Button size="sm" onClick={() => handleAssignBed(patient.patientId)}>
+                          <Button size="sm" onClick={() => handleAssignBed(patient)}>
                             Assign Bed
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleViewChart(patient.patientId)}>
                             View Chart
                           </Button>
                         </div>
@@ -302,7 +329,7 @@ const Emergency = () => {
                       )}
                       
                       {bed.status === 'available' && (
-                        <Button size="sm" className="w-full mt-2">
+                        <Button size="sm" className="w-full mt-2" onClick={() => handleAssignPatientToBed(bed.number)}>
                           Assign Patient
                         </Button>
                       )}
@@ -352,7 +379,7 @@ const Emergency = () => {
                           </p>
                         )}
                         {member.status === 'available' && (
-                          <Button size="sm">
+                          <Button size="sm" onClick={() => handleAssignPatientToStaff(member.name)}>
                             Assign Patient
                           </Button>
                         )}
@@ -372,27 +399,27 @@ const Emergency = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Daily ER Report')}>
                     <Siren className="h-6 w-6 mb-2" />
                     <span>Daily ER Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Wait Time Analysis')}>
                     <Clock className="h-6 w-6 mb-2" />
                     <span>Wait Time Analysis</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Triage Statistics')}>
                     <AlertTriangle className="h-6 w-6 mb-2" />
                     <span>Triage Statistics</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Patient Flow Report')}>
                     <Activity className="h-6 w-6 mb-2" />
                     <span>Patient Flow Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Staff Utilization')}>
                     <Users className="h-6 w-6 mb-2" />
                     <span>Staff Utilization</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Critical Case Summary')}>
                     <Heart className="h-6 w-6 mb-2" />
                     <span>Critical Case Summary</span>
                   </Button>
@@ -401,6 +428,13 @@ const Emergency = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <AssignBedDialog 
+          open={assignBedDialog.open} 
+          onOpenChange={(open) => setAssignBedDialog({open, patient: null})}
+          patient={assignBedDialog.patient}
+        />
       </div>
     </DashboardLayout>
   );

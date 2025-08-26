@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pill, Search, Package, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { UpdateStockDialog } from '@/components/pharmacy/UpdateStockDialog';
 
 const Pharmacy = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [updateStockDialog, setUpdateStockDialog] = useState<{open: boolean, drug: any}>({open: false, drug: null});
   
   const [prescriptions] = useState([
     {
@@ -125,6 +127,43 @@ const Pharmacy = () => {
     toast({
       title: "Medication Dispensed",
       description: `Prescription ${prescriptionId} has been dispensed successfully.`
+    });
+  };
+
+  const handleStartDispensing = (prescriptionId: string) => {
+    toast({
+      title: "Dispensing Started",
+      description: `Started processing prescription ${prescriptionId}.`
+    });
+  };
+
+  const handleViewPrescriptionDetails = (prescriptionId: string) => {
+    toast({
+      title: "Prescription Details",
+      description: `Viewing details for prescription ${prescriptionId}.`
+    });
+  };
+
+  const handleReorderStock = (drugName: string) => {
+    toast({
+      title: "Reorder Initiated",
+      description: `Reorder request sent for ${drugName}.`
+    });
+  };
+
+  const handleUpdateStock = (drug: any) => {
+    setUpdateStockDialog({open: true, drug: {
+      id: drug.id,
+      drugName: drug.drugName,
+      currentStock: drug.quantity,
+      minStock: drug.minStock
+    }});
+  };
+
+  const handleGenerateReport = (reportType: string) => {
+    toast({
+      title: "Report Generated",
+      description: `${reportType} has been generated successfully.`
     });
   };
 
@@ -258,7 +297,7 @@ const Pharmacy = () => {
                         </div>
                         <div className="flex gap-2">
                           {prescription.status === 'pending' && (
-                            <Button size="sm">
+                            <Button size="sm" onClick={() => handleStartDispensing(prescription.prescriptionId)}>
                               Start Dispensing
                             </Button>
                           )}
@@ -270,7 +309,7 @@ const Pharmacy = () => {
                               Complete Dispensing
                             </Button>
                           )}
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleViewPrescriptionDetails(prescription.prescriptionId)}>
                             View Details
                           </Button>
                         </div>
@@ -339,10 +378,10 @@ const Pharmacy = () => {
                         </div>
                         
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleReorderStock(item.drugName)}>
                             Reorder
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleUpdateStock(item)}>
                             Update Stock
                           </Button>
                         </div>
@@ -362,27 +401,27 @@ const Pharmacy = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Dispensing Report')}>
                     <Pill className="h-6 w-6 mb-2" />
                     <span>Dispensing Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Inventory Report')}>
                     <Package className="h-6 w-6 mb-2" />
                     <span>Inventory Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Low Stock Alert')}>
                     <AlertTriangle className="h-6 w-6 mb-2" />
                     <span>Low Stock Alert</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Expiry Report')}>
                     <Clock className="h-6 w-6 mb-2" />
                     <span>Expiry Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Sales Report')}>
                     <CheckCircle className="h-6 w-6 mb-2" />
                     <span>Sales Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Drug Usage Report')}>
                     <Pill className="h-6 w-6 mb-2" />
                     <span>Drug Usage Report</span>
                   </Button>
@@ -391,6 +430,13 @@ const Pharmacy = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <UpdateStockDialog 
+          open={updateStockDialog.open} 
+          onOpenChange={(open) => setUpdateStockDialog({open, drug: null})}
+          drug={updateStockDialog.drug}
+        />
       </div>
     </DashboardLayout>
   );

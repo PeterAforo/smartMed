@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, Users, AlertTriangle, Activity, Thermometer, Pill } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { RecordVitalsDialog } from '@/components/nurse/RecordVitalsDialog';
 
 const Nurse = () => {
   const { toast } = useToast();
+  const [vitalsDialog, setVitalsDialog] = useState<{open: boolean, patient: any}>({open: false, patient: null});
   
   const [assignedPatients] = useState([
     {
@@ -105,10 +107,35 @@ const Nurse = () => {
     });
   };
 
-  const handleRecordVitals = (patientId: string) => {
+  const handleRecordVitals = (patient: any) => {
+    setVitalsDialog({open: true, patient});
+  };
+
+  const handleViewChart = (patientId: string) => {
     toast({
-      title: "Vitals Recorded",
-      description: `Vital signs have been recorded for patient ${patientId}.`
+      title: "Medical Chart",
+      description: `Opening medical chart for patient ${patientId}.`
+    });
+  };
+
+  const handleUpdateVitals = (patientId: string) => {
+    toast({
+      title: "Update Vitals",
+      description: `Opening vitals update for patient ${patientId}.`
+    });
+  };
+
+  const handleViewMedicationSchedule = () => {
+    toast({
+      title: "Medication Schedule",
+      description: "Opening medication administration schedule."
+    });
+  };
+
+  const handleGenerateReport = (reportType: string) => {
+    toast({
+      title: "Report Generated",
+      description: `${reportType} has been generated successfully.`
     });
   };
 
@@ -192,11 +219,11 @@ const Nurse = () => {
                           </Badge>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" onClick={() => handleRecordVitals(patient.patientId)}>
+                          <Button size="sm" onClick={() => handleRecordVitals(patient)}>
                             <Thermometer className="mr-2 h-4 w-4" />
                             Record Vitals
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => handleViewChart(patient.patientId)}>
                             View Chart
                           </Button>
                         </div>
@@ -304,7 +331,7 @@ const Nurse = () => {
                         </div>
                       </div>
                       
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleUpdateVitals(vital.patient)}>
                         Update Vitals
                       </Button>
                     </div>
@@ -327,7 +354,7 @@ const Nurse = () => {
                   <p className="text-muted-foreground mb-4">
                     View and manage medication schedules for your assigned patients
                   </p>
-                  <Button>
+                  <Button onClick={handleViewMedicationSchedule}>
                     <Pill className="mr-2 h-4 w-4" />
                     View Medication Schedule
                   </Button>
@@ -344,27 +371,27 @@ const Nurse = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Patient Care Report')}>
                     <Heart className="h-6 w-6 mb-2" />
                     <span>Patient Care Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Shift Report')}>
                     <Activity className="h-6 w-6 mb-2" />
                     <span>Shift Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Vitals Summary')}>
                     <Thermometer className="h-6 w-6 mb-2" />
                     <span>Vitals Summary</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Medication Log')}>
                     <Pill className="h-6 w-6 mb-2" />
                     <span>Medication Log</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Incident Report')}>
                     <AlertTriangle className="h-6 w-6 mb-2" />
                     <span>Incident Report</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex-col">
+                  <Button variant="outline" className="h-24 flex-col" onClick={() => handleGenerateReport('Patient Handover')}>
                     <Users className="h-6 w-6 mb-2" />
                     <span>Patient Handover</span>
                   </Button>
@@ -373,6 +400,13 @@ const Nurse = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <RecordVitalsDialog 
+          open={vitalsDialog.open} 
+          onOpenChange={(open) => setVitalsDialog({open, patient: null})}
+          patient={vitalsDialog.patient}
+        />
       </div>
     </DashboardLayout>
   );

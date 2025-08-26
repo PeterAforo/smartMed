@@ -6,10 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CheckSquare, Search, Clock, User, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { WalkInRegistrationDialog } from '@/components/checkin/WalkInRegistrationDialog';
+import { QueueStatusDialog } from '@/components/checkin/QueueStatusDialog';
 
 const CheckIn = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [walkInDialogOpen, setWalkInDialogOpen] = useState(false);
+  const [queueDialogOpen, setQueueDialogOpen] = useState(false);
   
   const [appointments] = useState([
     { 
@@ -65,6 +69,20 @@ const CheckIn = () => {
     toast({
       title: "Patient Checked In",
       description: "Patient has been successfully checked in and added to the queue."
+    });
+  };
+
+  const handleCallPatient = (appointmentId: number) => {
+    toast({
+      title: "Patient Called",
+      description: "Patient has been notified to proceed to the doctor."
+    });
+  };
+
+  const handlePatientLookup = () => {
+    toast({
+      title: "Patient Lookup",
+      description: "Opening patient search interface..."
     });
   };
 
@@ -213,6 +231,7 @@ const CheckIn = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        onClick={() => handleCallPatient(appointment.id)}
                       >
                         Call Patient
                       </Button>
@@ -232,21 +251,31 @@ const CheckIn = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={() => setWalkInDialogOpen(true)}>
                 <User className="h-6 w-6 mb-2" />
                 <span>Walk-in Registration</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={() => setQueueDialogOpen(true)}>
                 <Clock className="h-6 w-6 mb-2" />
                 <span>View Queue Status</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={handlePatientLookup}>
                 <Search className="h-6 w-6 mb-2" />
                 <span>Patient Lookup</span>
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Dialogs */}
+        <WalkInRegistrationDialog 
+          open={walkInDialogOpen} 
+          onOpenChange={setWalkInDialogOpen} 
+        />
+        <QueueStatusDialog 
+          open={queueDialogOpen} 
+          onOpenChange={setQueueDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );
