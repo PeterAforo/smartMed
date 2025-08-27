@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Database, HardDrive, Cloud, Download, Upload, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CreateBackupJobDialog } from '@/components/backup/CreateBackupJobDialog';
 
 const Backup = () => {
   const { toast } = useToast();
+  const [createJobDialogOpen, setCreateJobDialogOpen] = useState(false);
 
   // Mock backup jobs data
   const [backupJobs] = useState([
@@ -283,7 +285,7 @@ const Backup = () => {
                 <CardDescription>
                   Monitor and manage automated and manual backup operations
                 </CardDescription>
-                <Button>
+                <Button onClick={() => setCreateJobDialogOpen(true)}>
                   <Database className="mr-2 h-4 w-4" />
                   Create New Backup Job
                 </Button>
@@ -539,6 +541,12 @@ const Backup = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialog */}
+        <CreateBackupJobDialog 
+          open={createJobDialogOpen} 
+          onOpenChange={setCreateJobDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );

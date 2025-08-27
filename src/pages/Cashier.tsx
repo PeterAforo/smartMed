@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreditCard, DollarSign, Receipt, Search, Clock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProcessRefundDialog } from '@/components/cashier/ProcessRefundDialog';
 
 const Cashier = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     patientId: '',
     amount: '',
@@ -334,6 +336,9 @@ const Cashier = () => {
                   <Button variant="outline" className="w-full">
                     Print Report
                   </Button>
+                  <Button variant="outline" className="w-full" onClick={() => setRefundDialogOpen(true)}>
+                    Process Refund
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -457,6 +462,12 @@ const Cashier = () => {
             </Tabs>
           </div>
         </div>
+
+        {/* Dialog */}
+        <ProcessRefundDialog 
+          open={refundDialogOpen} 
+          onOpenChange={setRefundDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );
