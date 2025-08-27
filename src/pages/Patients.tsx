@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import { NewPatientModal } from "@/components/dashboard/modals/NewPatientModal"
+import { EditPatientDialog } from "@/components/patients/EditPatientDialog"
 import { MedicalRecordsTab } from "@/components/patient/MedicalRecordsTab"
 import { PrescriptionsTab } from "@/components/patient/PrescriptionsTab"
 import { VitalSignsTab } from "@/components/patient/VitalSignsTab"
@@ -27,6 +28,7 @@ export default function Patients() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [showNewPatientModal, setShowNewPatientModal] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<any>(null)
+  const [showEditDialog, setShowEditDialog] = useState(false)
 
   const { data: patients, isLoading, refetch } = useQuery({
     queryKey: ['patients', currentBranch?.id],
@@ -242,7 +244,14 @@ export default function Patients() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedPatient(patient);
+                              setShowEditDialog(true);
+                            }}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
@@ -262,6 +271,11 @@ export default function Patients() {
         <NewPatientModal 
           open={showNewPatientModal} 
           onOpenChange={setShowNewPatientModal}
+        />
+        <EditPatientDialog
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+          patient={selectedPatient}
         />
 
         {/* Patient Details Modal */}

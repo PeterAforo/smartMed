@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import { ScheduleAppointmentModal } from "@/components/dashboard/modals/ScheduleAppointmentModal"
 import AppointmentTemplateManager from "@/components/appointments/AppointmentTemplateManager"
+import { ViewAppointmentDialog } from "@/components/appointments/ViewAppointmentDialog"
+import { EditAppointmentDialog } from "@/components/appointments/EditAppointmentDialog"
 import RecurringAppointmentDialog from "@/components/appointments/RecurringAppointmentDialog"
 import QueueDashboard from "@/components/appointments/QueueDashboard"
 import ResourceScheduler from "@/components/appointments/ResourceScheduler"
@@ -28,6 +30,9 @@ export default function Appointments() {
   const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false)
   const [showRecurringDialog, setShowRecurringDialog] = useState(false)
   const [activeTab, setActiveTab] = useState("appointments")
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
+  const [showViewDialog, setShowViewDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
 
   const { data: appointments, loading: isLoading, refetch } = useRealtimeAppointments()
 
@@ -313,10 +318,24 @@ export default function Appointments() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedAppointment(appointment);
+                              setShowViewDialog(true);
+                            }}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedAppointment(appointment);
+                              setShowEditDialog(true);
+                            }}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           {appointment.status === 'scheduled' && (
@@ -364,6 +383,21 @@ export default function Appointments() {
         <RecurringAppointmentDialog
           open={showRecurringDialog}
           onOpenChange={setShowRecurringDialog}
+        />
+        <ViewAppointmentDialog
+          open={showViewDialog}
+          onOpenChange={setShowViewDialog}
+          appointment={selectedAppointment}
+          onEdit={(appointment) => {
+            setSelectedAppointment(appointment);
+            setShowViewDialog(false);
+            setShowEditDialog(true);
+          }}
+        />
+        <EditAppointmentDialog
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+          appointment={selectedAppointment}
         />
         </div>
       </DashboardLayout>

@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, Search, Calendar, Clock, FileText, Monitor } from 'lucide-react';
+import { Camera, Search, Calendar, Clock, FileText, Monitor, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NewImagingOrderDialog } from '@/components/imaging/NewImagingOrderDialog';
+import { MedicalImagingViewer } from '@/components/imaging/MedicalImagingViewer';
 
 const Imaging = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNewOrderDialog, setShowNewOrderDialog] = useState(false);
+  const [showImageViewer, setShowImageViewer] = useState(false);
+  const [selectedStudy, setSelectedStudy] = useState<any>(null);
   
   const [imagingOrders] = useState([
     {
@@ -230,12 +235,18 @@ const Imaging = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6 p-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Camera className="h-8 w-8 text-primary" />
-            Medical Imaging
-          </h1>
-          <p className="text-muted-foreground">Manage imaging orders, studies, and equipment</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Camera className="h-8 w-8 text-primary" />
+              Medical Imaging
+            </h1>
+            <p className="text-muted-foreground">Manage imaging orders, studies, and equipment</p>
+          </div>
+          <Button onClick={() => setShowNewOrderDialog(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Order
+          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -367,7 +378,23 @@ const Imaging = () => {
                               Start Study
                             </Button>
                           )}
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              // Find corresponding study for this order
+                              const study = studies.find(s => s.orderNumber === order.orderNumber);
+                              if (study) {
+                                setSelectedStudy(study);
+                                setShowImageViewer(true);
+                              } else {
+                                toast({
+                                  title: "Study Not Found",
+                                  description: "This order has not been completed yet."
+                                });
+                              }
+                            }}
+                          >
                             View Details
                           </Button>
                         </div>
@@ -403,70 +430,7 @@ const Imaging = () => {
           </TabsContent>
 
           <TabsContent value="studies">
-            <Card>
-              <CardHeader>
-                <CardTitle>Studies & Reports</CardTitle>
-                <CardDescription>View completed studies and radiologist reports</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {studies.map((study) => (
-                    <div key={study.id} className="p-4 bg-muted rounded-lg">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <h3 className="font-semibold">{study.studyId}</h3>
-                            <p className="text-sm text-muted-foreground">Patient: {study.patientName}</p>
-                          </div>
-                          <Badge variant="outline">{study.modality}</Badge>
-                          <Badge className={getStatusColor(study.status)}>
-                            {study.status}
-                          </Badge>
-                          <Badge className={getReportStatusColor(study.reportStatus)}>
-                            {study.reportStatus}
-                          </Badge>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm">
-                            <Monitor className="mr-2 h-4 w-4" />
-                            View Images
-                          </Button>
-                          {study.reportStatus === 'final' && (
-                            <Button size="sm" variant="outline">
-                              <FileText className="mr-2 h-4 w-4" />
-                              View Report
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">Study Details</p>
-                          <p className="text-sm">Type: <span className="font-medium">{study.studyType}</span></p>
-                          <p className="text-sm">Body Part: <span className="font-medium">{study.bodyPart}</span></p>
-                          <p className="text-sm">Date: <span className="font-medium">{study.studyDate}</span></p>
-                          <p className="text-sm">Images: <span className="font-medium">{study.images}</span></p>
-                          <p className="text-sm">Radiologist: <span className="font-medium">{study.radiologist}</span></p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">Report</p>
-                          <div className="bg-background p-3 rounded border">
-                            <p className="text-sm mb-2">
-                              <strong>Findings:</strong> {study.findings}
-                            </p>
-                            <p className="text-sm">
-                              <strong>Impression:</strong> {study.impression}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <MedicalImagingViewer />
           </TabsContent>
 
           <TabsContent value="equipment">
@@ -570,6 +534,19 @@ const Imaging = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <NewImagingOrderDialog
+          open={showNewOrderDialog}
+          onOpenChange={setShowNewOrderDialog}
+          onSuccess={() => {
+            setShowNewOrderDialog(false);
+            toast({
+              title: "Success",
+              description: "Imaging order created successfully"
+            });
+          }}
+        />
       </div>
     </DashboardLayout>
   );
