@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, UserPlus, Calendar, Clock, Award, TrendingUp, Search, Plus, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AddEmployeeDialog } from '@/components/hr/AddEmployeeDialog';
 
 const HR = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
 
   // Mock data for employees
   const [employees] = useState([
@@ -263,7 +265,7 @@ const HR = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
-                  <Button>
+                  <Button onClick={() => setAddEmployeeOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Employee
                   </Button>
@@ -521,6 +523,11 @@ const HR = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <AddEmployeeDialog 
+        open={addEmployeeOpen}
+        onOpenChange={setAddEmployeeOpen}
+      />
     </DashboardLayout>
   );
 };

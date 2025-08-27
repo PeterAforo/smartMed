@@ -7,10 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Package, Search, AlertTriangle, TrendingDown, TrendingUp, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { StockAdjustmentDialog } from '@/components/inventory/StockAdjustmentDialog';
 
 const Inventory = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [stockAdjustmentOpen, setStockAdjustmentOpen] = useState(false);
+  const [selectedItemCode, setSelectedItemCode] = useState('');
   
   const [inventoryItems] = useState([
     {
@@ -150,10 +153,8 @@ const Inventory = () => {
   };
 
   const handleStockAdjustment = (itemCode: string) => {
-    toast({
-      title: "Stock Adjustment",
-      description: `Stock adjustment form opened for item ${itemCode}.`
-    });
+    setSelectedItemCode(itemCode);
+    setStockAdjustmentOpen(true);
   };
 
   const formatCurrency = (amount: number) => {
@@ -472,6 +473,12 @@ const Inventory = () => {
           </div>
         </div>
       </div>
+      
+      <StockAdjustmentDialog 
+        open={stockAdjustmentOpen}
+        onOpenChange={setStockAdjustmentOpen}
+        itemCode={selectedItemCode}
+      />
     </DashboardLayout>
   );
 };

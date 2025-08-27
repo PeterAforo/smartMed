@@ -6,9 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Bed, Heart, Clock, AlertTriangle, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ManageBedsDialog } from '@/components/ward/ManageBedsDialog';
 
 const Ward = () => {
   const { toast } = useToast();
+  const [manageBedsOpen, setManageBedsOpen] = useState(false);
+  const [selectedWard, setSelectedWard] = useState('');
   
   const [wards] = useState([
     {
@@ -299,7 +302,14 @@ const Ward = () => {
                           <Users className="mr-2 h-4 w-4" />
                           View All Patients
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedWard(ward.name);
+                            setManageBedsOpen(true);
+                          }}
+                        >
                           <Bed className="mr-2 h-4 w-4" />
                           Manage Beds
                         </Button>
@@ -409,6 +419,12 @@ const Ward = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <ManageBedsDialog 
+        open={manageBedsOpen}
+        onOpenChange={setManageBedsOpen}
+        wardName={selectedWard}
+      />
     </DashboardLayout>
   );
 };
