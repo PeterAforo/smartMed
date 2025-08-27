@@ -13,6 +13,7 @@ import { useDashboardStats } from "@/hooks/useDashboardData"
 import { useAnalyticsDashboard } from "@/hooks/useAnalytics"
 import { AppointmentTrendsChart, RevenueTrendsChart, PatientFlowChart, AppointmentTypeChart } from "@/components/analytics/AnalyticsCharts"
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
+import { GenerateReportDialog } from "@/components/reports/GenerateReportDialog"
 
 // Mock data for reports
 const patientFlowData = [
@@ -88,6 +89,7 @@ export default function Reports() {
   const { currentBranch } = useAuth()
   const { data: stats } = useDashboardStats()
   const analytics = useAnalyticsDashboard()
+  const [generateReportOpen, setGenerateReportOpen] = useState(false)
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date())
@@ -109,11 +111,17 @@ export default function Reports() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
-            <p className="text-muted-foreground">Comprehensive insights and data analysis</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
+              <p className="text-muted-foreground">Comprehensive insights and data analysis</p>
+            </div>
+            <Button onClick={() => setGenerateReportOpen(true)}>
+              <FileText className="h-4 w-4 mr-2" />
+              Generate Custom Report
+            </Button>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2">{/* ... rest of filters ... */}
             <Select value={reportCategory} onValueChange={setReportCategory}>
               <SelectTrigger className="w-[150px]">
                 <Filter className="h-4 w-4 mr-2" />
@@ -335,6 +343,11 @@ export default function Reports() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <GenerateReportDialog 
+        open={generateReportOpen}
+        onOpenChange={setGenerateReportOpen}
+      />
     </DashboardLayout>
   )
 }

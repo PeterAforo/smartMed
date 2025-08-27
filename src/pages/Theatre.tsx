@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Scissors, Clock, Users, AlertTriangle, Calendar, CheckCircle, Activity, Stethoscope } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ScheduleSurgeryDialog } from '@/components/theatre/ScheduleSurgeryDialog';
 
 const Theatre = () => {
   const { toast } = useToast();
+  const [scheduleSurgeryOpen, setScheduleSurgeryOpen] = useState(false);
 
   // Mock data for surgical schedule
   const [surgicalSchedule] = useState([
@@ -246,10 +248,17 @@ const Theatre = () => {
           <TabsContent value="schedule" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Today's Surgical Schedule</CardTitle>
-                <CardDescription>
-                  Monitor and manage surgical cases for today
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Today's Surgical Schedule</CardTitle>
+                    <CardDescription>
+                      Monitor and manage surgical cases for today
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => setScheduleSurgeryOpen(true)}>
+                    Schedule Surgery
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -486,6 +495,11 @@ const Theatre = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <ScheduleSurgeryDialog 
+        open={scheduleSurgeryOpen}
+        onOpenChange={setScheduleSurgeryOpen}
+      />
     </DashboardLayout>
   );
 };

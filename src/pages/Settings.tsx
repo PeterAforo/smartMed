@@ -13,11 +13,13 @@ import { Badge } from "@/components/ui/badge"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
+import { SystemConfigDialog } from "@/components/settings/SystemConfigDialog"
 
 export default function Settings() {
   const { user, profile, tenant, currentBranch } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [systemConfigOpen, setSystemConfigOpen] = useState(false)
 
   // Profile settings state
   const [profileSettings, setProfileSettings] = useState({
@@ -546,10 +548,16 @@ export default function Settings() {
                     />
                   </div>
                 </div>
-                <Button onClick={handleSaveSystem} disabled={loading}>
-                  <Save className="h-4 w-4 mr-2" />
-                  {loading ? 'Saving...' : 'Save System Settings'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveSystem} disabled={loading}>
+                    <Save className="h-4 w-4 mr-2" />
+                    {loading ? 'Saving...' : 'Save System Settings'}
+                  </Button>
+                  <Button variant="outline" onClick={() => setSystemConfigOpen(true)}>
+                    <Database className="h-4 w-4 mr-2" />
+                    Advanced Configuration
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -600,6 +608,11 @@ export default function Settings() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <SystemConfigDialog 
+        open={systemConfigOpen}
+        onOpenChange={setSystemConfigOpen}
+      />
     </DashboardLayout>
   )
 }
