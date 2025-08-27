@@ -6,9 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Building2, TrendingUp, Users, DollarSign, BarChart3, FileText, Target, Award } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CreateInitiativeDialog } from '@/components/corporate/CreateInitiativeDialog';
 
 const Corporate = () => {
   const { toast } = useToast();
+  const [createInitiativeDialogOpen, setCreateInitiativeDialogOpen] = useState(false);
 
   const [corporateMetrics] = useState({
     totalRevenue: 2500000,
@@ -266,6 +268,10 @@ const Corporate = () => {
                 <CardDescription>
                   Track progress of corporate strategic initiatives and projects
                 </CardDescription>
+                <Button onClick={() => setCreateInitiativeDialogOpen(true)}>
+                  <Target className="mr-2 h-4 w-4" />
+                  Create New Initiative
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -431,6 +437,12 @@ const Corporate = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialog */}
+        <CreateInitiativeDialog 
+          open={createInitiativeDialogOpen} 
+          onOpenChange={setCreateInitiativeDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );

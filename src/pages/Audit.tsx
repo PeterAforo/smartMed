@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Shield, Eye, FileText, User, Clock, AlertTriangle, Search, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { GenerateAuditReportDialog } from '@/components/audit/GenerateAuditReportDialog';
 
 const Audit = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [generateReportDialogOpen, setGenerateReportDialogOpen] = useState(false);
 
   // Mock audit log data
   const [auditLogs] = useState([
@@ -482,6 +484,10 @@ const Audit = () => {
                 <CardDescription>
                   Generate comprehensive audit reports and compliance documentation
                 </CardDescription>
+                <Button onClick={() => setGenerateReportDialogOpen(true)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Generate Custom Report
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -514,6 +520,12 @@ const Audit = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialog */}
+        <GenerateAuditReportDialog 
+          open={generateReportDialogOpen} 
+          onOpenChange={setGenerateReportDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );

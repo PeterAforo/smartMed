@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Code, Server, Database, Key, Globe, Settings, Activity, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CreateApiEndpointDialog } from '@/components/api/CreateApiEndpointDialog';
 
 const API = () => {
   const { toast } = useToast();
+  const [createEndpointDialogOpen, setCreateEndpointDialogOpen] = useState(false);
 
   // Mock API endpoints data
   const [apiEndpoints] = useState([
@@ -250,7 +252,7 @@ const API = () => {
                 <CardDescription>
                   Manage REST API endpoints, versions, and performance metrics
                 </CardDescription>
-                <Button>
+                <Button onClick={() => setCreateEndpointDialogOpen(true)}>
                   <Code className="mr-2 h-4 w-4" />
                   Create New Endpoint
                 </Button>
@@ -520,6 +522,12 @@ const API = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialog */}
+        <CreateApiEndpointDialog 
+          open={createEndpointDialogOpen} 
+          onOpenChange={setCreateEndpointDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );
