@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Search, DollarSign, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SubmitClaimDialog } from '@/components/claims/SubmitClaimDialog';
 
 const Claims = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [submitClaimOpen, setSubmitClaimOpen] = useState(false);
   
   const [claims] = useState([
     {
@@ -147,10 +149,7 @@ const Claims = () => {
   };
 
   const handleSubmitClaim = () => {
-    toast({
-      title: "Claim Submitted",
-      description: "Insurance claim has been submitted successfully."
-    });
+    setSubmitClaimOpen(true);
   };
 
   const handleApproveClaim = (claimNumber: string) => {
@@ -557,6 +556,11 @@ const Claims = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <SubmitClaimDialog 
+        open={submitClaimOpen}
+        onOpenChange={setSubmitClaimOpen}
+      />
     </DashboardLayout>
   );
 };

@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Camera, FileText, Clock, User, Search, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ScheduleImagingDialog } from '@/components/radiology/ScheduleImagingDialog';
 
 const Radiology = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [scheduleImagingOpen, setScheduleImagingOpen] = useState(false);
 
   // Mock data for radiology imaging queue
   const [imagingQueue] = useState([
@@ -204,7 +206,7 @@ const Radiology = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
-                  <Button>
+                  <Button onClick={() => setScheduleImagingOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Schedule Exam
                   </Button>
@@ -371,6 +373,11 @@ const Radiology = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <ScheduleImagingDialog 
+        open={scheduleImagingOpen}
+        onOpenChange={setScheduleImagingOpen}
+      />
     </DashboardLayout>
   );
 };

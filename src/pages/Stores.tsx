@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Package, AlertTriangle, TrendingUp, ShoppingCart, Search, Plus, Truck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CreatePurchaseOrderDialog } from '@/components/stores/CreatePurchaseOrderDialog';
 
 const Stores = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [createPOOpen, setCreatePOOpen] = useState(false);
 
   // Mock data for inventory items
   const [inventory] = useState([
@@ -322,7 +324,7 @@ const Stores = () => {
                 <CardDescription>
                   Track purchase orders and manage supplier deliveries
                 </CardDescription>
-                <Button>
+                <Button onClick={() => setCreatePOOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Purchase Order
                 </Button>
@@ -453,6 +455,11 @@ const Stores = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <CreatePurchaseOrderDialog 
+        open={createPOOpen}
+        onOpenChange={setCreatePOOpen}
+      />
     </DashboardLayout>
   );
 };
