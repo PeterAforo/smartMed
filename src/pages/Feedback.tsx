@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageSquare, Star, ThumbsUp, AlertCircle, TrendingUp, Users, Search, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SubmitFeedbackDialog } from '@/components/feedback/SubmitFeedbackDialog';
 
 const Feedback = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [submitFeedbackOpen, setSubmitFeedbackOpen] = useState(false);
 
   // Mock feedback data
   const [patientFeedback] = useState([
@@ -257,9 +259,9 @@ const Feedback = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
-                  <Button>
+                  <Button onClick={() => setSubmitFeedbackOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Send Survey
+                    Submit Feedback
                   </Button>
                 </div>
               </CardHeader>
@@ -498,6 +500,11 @@ const Feedback = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <SubmitFeedbackDialog 
+        open={submitFeedbackOpen}
+        onOpenChange={setSubmitFeedbackOpen}
+      />
     </DashboardLayout>
   );
 };

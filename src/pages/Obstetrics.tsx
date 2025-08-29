@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Baby, Heart, Calendar, Clock, User, Bell, Search, Plus, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NewPregnancyRecordDialog } from '@/components/obstetrics/NewPregnancyRecordDialog';
 
 const Obstetrics = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [newPregnancyRecordOpen, setNewPregnancyRecordOpen] = useState(false);
 
   // Mock data for expectant mothers
   const [expectantMothers] = useState([
@@ -253,7 +255,7 @@ const Obstetrics = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
-                  <Button>
+                  <Button onClick={() => setNewPregnancyRecordOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     New Pregnancy Record
                   </Button>
@@ -485,6 +487,11 @@ const Obstetrics = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <NewPregnancyRecordDialog 
+        open={newPregnancyRecordOpen}
+        onOpenChange={setNewPregnancyRecordOpen}
+      />
     </DashboardLayout>
   );
 };

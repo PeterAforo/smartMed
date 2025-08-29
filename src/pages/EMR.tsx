@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, User, Heart, Calendar, Search, Plus, Activity, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NewMedicalRecordDialog } from '@/components/emr/NewMedicalRecordDialog';
 
 const EMR = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [newRecordOpen, setNewRecordOpen] = useState(false);
 
   // Mock data for patient records
   const [patientRecords] = useState([
@@ -119,10 +121,7 @@ const EMR = () => {
   };
 
   const handleNewRecord = () => {
-    toast({
-      title: "New Record",
-      description: "Creating new patient medical record",
-    });
+    setNewRecordOpen(true);
   };
 
   const filteredRecords = patientRecords.filter(record =>
@@ -411,6 +410,11 @@ const EMR = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <NewMedicalRecordDialog 
+        open={newRecordOpen}
+        onOpenChange={setNewRecordOpen}
+      />
     </DashboardLayout>
   );
 };
