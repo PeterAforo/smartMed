@@ -588,6 +588,69 @@ export type Database = {
           },
         ]
       }
+      audit_events: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_type: string
+          after_data: Json | null
+          before_data: Json | null
+          branch_id: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          event_id: string
+          event_timestamp: string
+          hash_chain: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          session_id: string | null
+          tenant_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_type: string
+          after_data?: Json | null
+          before_data?: Json | null
+          branch_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          event_id: string
+          event_timestamp?: string
+          hash_chain?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          session_id?: string | null
+          tenant_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_type?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          branch_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          event_id?: string
+          event_timestamp?: string
+          hash_chain?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          session_id?: string | null
+          tenant_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       beds: {
         Row: {
           admitted_at: string | null
@@ -946,6 +1009,69 @@ export type Database = {
           preparation_instructions?: string | null
           procedure_code?: string
           procedure_name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      encounters: {
+        Row: {
+          attending_staff: string | null
+          branch_id: string
+          chief_complaint: string | null
+          created_at: string
+          diagnoses: Json | null
+          encounter_number: string
+          encounter_type: string
+          end_time: string | null
+          id: string
+          linked_invoices: string[] | null
+          linked_orders: string[] | null
+          location: string | null
+          notes: string | null
+          patient_id: string
+          start_time: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          attending_staff?: string | null
+          branch_id: string
+          chief_complaint?: string | null
+          created_at?: string
+          diagnoses?: Json | null
+          encounter_number: string
+          encounter_type: string
+          end_time?: string | null
+          id?: string
+          linked_invoices?: string[] | null
+          linked_orders?: string[] | null
+          location?: string | null
+          notes?: string | null
+          patient_id: string
+          start_time?: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          attending_staff?: string | null
+          branch_id?: string
+          chief_complaint?: string | null
+          created_at?: string
+          diagnoses?: Json | null
+          encounter_number?: string
+          encounter_type?: string
+          end_time?: string | null
+          id?: string
+          linked_invoices?: string[] | null
+          linked_orders?: string[] | null
+          location?: string | null
+          notes?: string | null
+          patient_id?: string
+          start_time?: string
+          status?: string
           tenant_id?: string
           updated_at?: string
         }
@@ -2130,6 +2256,78 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          branch_id: string
+          charges: Json | null
+          clinical_notes: string | null
+          completed_at: string | null
+          created_at: string
+          encounter_id: string
+          id: string
+          instructions: string | null
+          metadata: Json | null
+          order_code: string
+          order_name: string
+          order_number: string
+          order_type: string
+          ordered_at: string
+          ordered_by: string
+          patient_id: string
+          priority: string
+          scheduled_at: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          branch_id: string
+          charges?: Json | null
+          clinical_notes?: string | null
+          completed_at?: string | null
+          created_at?: string
+          encounter_id: string
+          id?: string
+          instructions?: string | null
+          metadata?: Json | null
+          order_code: string
+          order_name: string
+          order_number: string
+          order_type: string
+          ordered_at?: string
+          ordered_by: string
+          patient_id: string
+          priority?: string
+          scheduled_at?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string
+          charges?: Json | null
+          clinical_notes?: string | null
+          completed_at?: string | null
+          created_at?: string
+          encounter_id?: string
+          id?: string
+          instructions?: string | null
+          metadata?: Json | null
+          order_code?: string
+          order_name?: string
+          order_number?: string
+          order_type?: string
+          ordered_at?: string
+          ordered_by?: string
+          patient_id?: string
+          priority?: string
+          scheduled_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       patient_allergies: {
         Row: {
           allergen: string
@@ -2492,6 +2690,69 @@ export type Database = {
           },
         ]
       }
+      results: {
+        Row: {
+          attachments: Json | null
+          branch_id: string
+          created_at: string
+          critical_flag: boolean | null
+          id: string
+          notes: string | null
+          order_id: string
+          patient_id: string
+          reference_ranges: Json | null
+          reported_at: string
+          reported_by: string | null
+          result_data: Json
+          result_type: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          branch_id: string
+          created_at?: string
+          critical_flag?: boolean | null
+          id?: string
+          notes?: string | null
+          order_id: string
+          patient_id: string
+          reference_ranges?: Json | null
+          reported_at?: string
+          reported_by?: string | null
+          result_data?: Json
+          result_type: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          branch_id?: string
+          created_at?: string
+          critical_flag?: boolean | null
+          id?: string
+          notes?: string | null
+          order_id?: string
+          patient_id?: string
+          reference_ranges?: Json | null
+          reported_at?: string
+          reported_by?: string | null
+          result_data?: Json
+          result_type?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
       revenue: {
         Row: {
           amount: number
@@ -2690,6 +2951,72 @@ export type Database = {
           start_time?: string
           status?: string | null
           tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stock_moves: {
+        Row: {
+          batch_id: string | null
+          branch_id: string
+          created_at: string
+          id: string
+          item_id: string
+          location_from: string | null
+          location_to: string | null
+          move_type: string
+          moved_at: string
+          moved_by: string
+          notes: string | null
+          quantity_change: number
+          reason: string
+          reference_id: string | null
+          reference_type: string | null
+          tenant_id: string
+          total_cost: number | null
+          unit_cost: number | null
+          updated_at: string
+        }
+        Insert: {
+          batch_id?: string | null
+          branch_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          location_from?: string | null
+          location_to?: string | null
+          move_type: string
+          moved_at?: string
+          moved_by: string
+          notes?: string | null
+          quantity_change: number
+          reason: string
+          reference_id?: string | null
+          reference_type?: string | null
+          tenant_id: string
+          total_cost?: number | null
+          unit_cost?: number | null
+          updated_at?: string
+        }
+        Update: {
+          batch_id?: string | null
+          branch_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          location_from?: string | null
+          location_to?: string | null
+          move_type?: string
+          moved_at?: string
+          moved_by?: string
+          notes?: string | null
+          quantity_change?: number
+          reason?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          tenant_id?: string
+          total_cost?: number | null
+          unit_cost?: number | null
           updated_at?: string
         }
         Relationships: []
