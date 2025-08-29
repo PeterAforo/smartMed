@@ -1,61 +1,60 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Stethoscope } from 'lucide-react';
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { RoleBasedStats } from "@/components/dashboard/RoleBasedStats";
+import RecentActivities from "@/components/dashboard/RecentActivities";
+import AIInsights from "@/components/dashboard/AIInsights";
+import QuickActions from "@/components/dashboard/QuickActions";
+import { DashboardAnalyticsSection } from "@/components/analytics/DashboardAnalyticsSection";
+import { PerformanceMonitor } from "@/components/performance/PerformanceMonitor";
+import { MobileOptimization } from "@/components/mobile/MobileOptimization";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const Index = () => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+export default function Index() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-background p-4">
-      <Card className="w-full max-w-md healthcare-card border-0 shadow-2xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <Stethoscope className="h-10 w-10 text-primary" />
-            </div>
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-foreground">
-              Welcome to SmartMed
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Smart Hospital Management System
-            </CardDescription>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          <p className="text-center text-muted-foreground">
-            Please sign in to access the smart hospital management system.
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Healthcare Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Welcome back! Here's your comprehensive hospital overview with real-time data and AI insights.
           </p>
-          
-          <Button 
-            onClick={() => window.location.href = '/auth'}
-            className="w-full healthcare-gradient text-primary-foreground font-medium py-3"
-          >
-            Sign In
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+        </div>
 
-export default Index;
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="mobile">Mobile</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Role-based Key Stats */}
+            <RoleBasedStats />
+
+            {/* Analytics Overview */}
+            <DashboardAnalyticsSection />
+
+            {/* Main Content Grid */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              <AIInsights />
+              <RecentActivities />
+            </div>
+
+            {/* Quick Actions */}
+            <QuickActions />
+          </TabsContent>
+
+          <TabsContent value="performance">
+            <PerformanceMonitor />
+          </TabsContent>
+
+          <TabsContent value="mobile">
+            <MobileOptimization />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </DashboardLayout>
+  );
+}
