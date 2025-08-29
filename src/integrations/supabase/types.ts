@@ -230,6 +230,54 @@ export type Database = {
           },
         ]
       }
+      api_monitoring: {
+        Row: {
+          created_at: string
+          endpoint_path: string
+          error_message: string | null
+          id: string
+          ip_address: unknown | null
+          method: string
+          request_size_bytes: number | null
+          response_size_bytes: number | null
+          response_status: number
+          response_time_ms: number
+          tenant_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint_path: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          method: string
+          request_size_bytes?: number | null
+          response_size_bytes?: number | null
+          response_status: number
+          response_time_ms: number
+          tenant_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          endpoint_path?: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          method?: string
+          request_size_bytes?: number | null
+          response_size_bytes?: number | null
+          response_status?: number
+          response_time_ms?: number
+          tenant_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       appointment_queue: {
         Row: {
           actual_start_time: string | null
@@ -1857,6 +1905,47 @@ export type Database = {
         }
         Relationships: []
       }
+      job_executions: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          execution_data: Json | null
+          id: string
+          job_id: string
+          started_at: string
+          status: string
+          tenant_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          execution_data?: Json | null
+          id?: string
+          job_id: string
+          started_at?: string
+          status: string
+          tenant_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          execution_data?: Json | null
+          id?: string
+          job_id?: string
+          started_at?: string
+          status?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_executions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_orders: {
         Row: {
           branch_id: string
@@ -2517,6 +2606,33 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       prescription_renewals: {
         Row: {
           approval_date: string | null
@@ -2842,6 +2958,38 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_bookings: {
         Row: {
           appointment_id: string | null
@@ -2903,6 +3051,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scheduled_jobs: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          job_data: Json | null
+          job_name: string
+          job_type: string
+          last_run_at: string | null
+          next_run_at: string | null
+          schedule_expression: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          job_data?: Json | null
+          job_name: string
+          job_type: string
+          last_run_at?: string | null
+          next_run_at?: string | null
+          schedule_expression: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          job_data?: Json | null
+          job_name?: string
+          job_type?: string
+          last_run_at?: string | null
+          next_run_at?: string | null
+          schedule_expression?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       staff_schedules: {
         Row: {
@@ -3248,6 +3441,111 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_deliveries: {
+        Row: {
+          attempt_number: number
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          response_time_ms: number | null
+          tenant_id: string
+          webhook_endpoint_id: string
+        }
+        Insert: {
+          attempt_number?: number
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          next_retry_at?: string | null
+          payload: Json
+          response_body?: string | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          tenant_id: string
+          webhook_endpoint_id: string
+        }
+        Update: {
+          attempt_number?: number
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          tenant_id?: string
+          webhook_endpoint_id?: string
+        }
+        Relationships: []
+      }
+      webhook_endpoints: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          events: string[]
+          headers: Json | null
+          id: string
+          last_delivery_at: string | null
+          name: string
+          retry_attempts: number
+          secret: string
+          status: string
+          success_rate: number | null
+          tenant_id: string
+          timeout_seconds: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          events?: string[]
+          headers?: Json | null
+          id?: string
+          last_delivery_at?: string | null
+          name: string
+          retry_attempts?: number
+          secret: string
+          status?: string
+          success_rate?: number | null
+          tenant_id: string
+          timeout_seconds?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          events?: string[]
+          headers?: Json | null
+          id?: string
+          last_delivery_at?: string | null
+          name?: string
+          retry_attempts?: number
+          secret?: string
+          status?: string
+          success_rate?: number | null
+          tenant_id?: string
+          timeout_seconds?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       workflow_instances: {
         Row: {
           assigned_to: string | null
@@ -3585,6 +3883,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string[]
       }
+      get_user_permissions: {
+        Args: { _user_id: string }
+        Returns: {
+          action: string
+          permission_name: string
+          resource: string
+        }[]
+      }
       get_user_tenant_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -3593,12 +3899,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      has_permission: {
+        Args: { _permission_name: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      update_webhook_success_rate: {
+        Args: { webhook_id: string }
+        Returns: undefined
       }
     }
     Enums: {
@@ -3614,6 +3928,7 @@ export type Database = {
         | "manager"
         | "lab_technician"
         | "billing"
+        | "compliance"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3753,6 +4068,7 @@ export const Constants = {
         "manager",
         "lab_technician",
         "billing",
+        "compliance",
       ],
     },
   },
