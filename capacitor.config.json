@@ -1,0 +1,15 @@
+{
+  "appId": "app.lovable.e2a0794f0e45452e9c694a66c1ac7678",
+  "appName": "SmartMed Healthcare",
+  "webDir": "dist",
+  "server": {
+    "url": "https://e2a0794f-0e45-452e-9c69-4a66c1ac7678.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

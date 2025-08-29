@@ -3,6 +3,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PatientPortal from '@/components/patient/PatientPortal';
 import MobileAppDashboard from '@/components/mobile/MobileAppDashboard';
+import MobileAppManager from '@/components/mobile/MobileAppManager';
 
 const Mobile = () => {
   return (
@@ -14,9 +15,10 @@ const Mobile = () => {
         </div>
 
         <Tabs defaultValue="patient-portal" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="patient-portal">Patient Portal</TabsTrigger>
-            <TabsTrigger value="mobile-dashboard">Mobile App Management</TabsTrigger>
+            <TabsTrigger value="mobile-dashboard">Mobile Dashboard</TabsTrigger>
+            <TabsTrigger value="mobile-manager">Mobile Manager</TabsTrigger>
           </TabsList>
 
           <TabsContent value="patient-portal">
@@ -25,6 +27,10 @@ const Mobile = () => {
 
           <TabsContent value="mobile-dashboard">
             <MobileAppDashboard />
+          </TabsContent>
+
+          <TabsContent value="mobile-manager">
+            <MobileAppManager />
           </TabsContent>
         </Tabs>
       </div>
