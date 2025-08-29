@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 
-// Define comprehensive role hierarchy
+// Define comprehensive role hierarchy 
 export const ROLES = {
   // Administrative roles
   SUPER_ADMIN: 'super_admin',
