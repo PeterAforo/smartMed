@@ -8,6 +8,7 @@ import { Stethoscope, Calendar, Users, Clock, FileText, Pill } from 'lucide-reac
 import { useToast } from '@/hooks/use-toast';
 import { ViewPatientDialog } from '@/components/doctor/ViewPatientDialog';
 import { CreatePrescriptionDialog } from '@/components/doctor/CreatePrescriptionDialog';
+import { ConsultationInterface } from '@/components/doctor/ConsultationInterface';
 
 const Doctor = () => {
   const { toast } = useToast();
@@ -15,7 +16,9 @@ const Doctor = () => {
   // Dialog states
   const [showPatientDialog, setShowPatientDialog] = useState(false);
   const [showPrescriptionDialog, setShowPrescriptionDialog] = useState(false);
+  const [showConsultationInterface, setShowConsultationInterface] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [activeAppointment, setActiveAppointment] = useState<any>(null);
   
   const [todayAppointments] = useState([
     {
@@ -103,12 +106,9 @@ const Doctor = () => {
   const handleStartConsultation = (appointmentId: number) => {
     const appointment = todayAppointments.find(app => app.id === appointmentId);
     if (appointment) {
-      appointment.status = 'in-progress';
+      setActiveAppointment(appointment);
+      setShowConsultationInterface(true);
     }
-    toast({
-      title: "Consultation Started",
-      description: "Patient consultation has been started."
-    });
   };
 
   const handleCompleteConsultation = (appointmentId: number) => {
@@ -397,6 +397,15 @@ const Doctor = () => {
         <CreatePrescriptionDialog
           open={showPrescriptionDialog}
           onOpenChange={setShowPrescriptionDialog}
+        />
+
+        <ConsultationInterface
+          open={showConsultationInterface}
+          onClose={() => {
+            setShowConsultationInterface(false);
+            setActiveAppointment(null);
+          }}
+          appointment={activeAppointment}
         />
       </div>
     </DashboardLayout>
