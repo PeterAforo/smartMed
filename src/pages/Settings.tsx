@@ -14,6 +14,9 @@ import DashboardLayout from "@/components/layout/DashboardLayout"
 import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
 import { SystemConfigDialog } from "@/components/settings/SystemConfigDialog"
+import ComplianceManager from "@/components/compliance/ComplianceManager"
+import SystemAdministration from "@/components/admin/SystemAdministration"
+import BusinessIntelligence from "@/components/analytics/BusinessIntelligence"
 
 export default function Settings() {
   const { user, profile, tenant, currentBranch } = useAuth()
@@ -136,13 +139,16 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-9 lg:grid-cols-9">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="branch">Branch</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="system">System</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
+            <TabsTrigger value="admin">Administration</TabsTrigger>
+            <TabsTrigger value="business">Business Intelligence</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -605,6 +611,18 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="compliance" className="space-y-6">
+            <ComplianceManager />
+          </TabsContent>
+
+          <TabsContent value="admin" className="space-y-6">
+            <SystemAdministration />
+          </TabsContent>
+
+          <TabsContent value="business" className="space-y-6">
+            <BusinessIntelligence />
           </TabsContent>
         </Tabs>
       </div>
