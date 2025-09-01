@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Search, DollarSign, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { FileText, Search, Banknote, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SubmitClaimDialog } from '@/components/claims/SubmitClaimDialog';
 
@@ -174,10 +174,10 @@ const Claims = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return `₵${amount.toLocaleString('en-GH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   const filteredClaims = claims.filter(claim =>
@@ -250,7 +250,7 @@ const Claims = () => {
                   <p className="text-sm text-muted-foreground">Total Value</p>
                   <p className="text-2xl font-bold text-blue-600">{formatCurrency(stats.totalClaimValue)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-blue-600" />
+                <Banknote className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -261,7 +261,7 @@ const Claims = () => {
                   <p className="text-sm text-muted-foreground">Approved Value</p>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.approvedValue)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Banknote className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
@@ -531,7 +531,7 @@ const Claims = () => {
                     <span>Claims Summary</span>
                   </Button>
                   <Button variant="outline" className="h-24 flex-col">
-                    <DollarSign className="h-6 w-6 mb-2" />
+                    <Banknote className="h-6 w-6 mb-2" />
                     <span>Financial Report</span>
                   </Button>
                   <Button variant="outline" className="h-24 flex-col">

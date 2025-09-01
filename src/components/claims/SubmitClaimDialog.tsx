@@ -193,7 +193,7 @@ export const SubmitClaimDialog = ({ open, onOpenChange }: SubmitClaimDialogProps
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="claimAmount">Claim Amount ($)</Label>
+                <Label htmlFor="claimAmount">Claim Amount (₵)</Label>
                 <Input
                   id="claimAmount"
                   type="number"
