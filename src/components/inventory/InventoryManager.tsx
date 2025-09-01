@@ -18,7 +18,7 @@ import {
   Upload,
   Truck,
   Clock,
-  DollarSign,
+  Banknote,
   BarChart3,
   ShoppingCart,
   Warehouse,
@@ -252,10 +252,10 @@ const InventoryManager = ({ className }: InventoryManagerProps) => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5 text-green-500" />
+              <Banknote className="h-5 w-5 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Value</p>
-                <p className="text-2xl font-bold">${totalValue.toLocaleString()}</p>
+                <p className="text-2xl font-bold">₵{totalValue.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
@@ -365,7 +365,7 @@ const InventoryManager = ({ className }: InventoryManagerProps) => {
                             </p>
                           </div>
                         </TableCell>
-                        <TableCell>${item.unitCost.toFixed(2)}</TableCell>
+                        <TableCell>₵{item.unitCost.toFixed(2)}</TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">{item.supplier}</p>

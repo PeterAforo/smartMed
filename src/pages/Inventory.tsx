@@ -158,10 +158,10 @@ const Inventory = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return `₵${amount.toLocaleString('en-GH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   const filteredItems = inventoryItems.filter(item =>
