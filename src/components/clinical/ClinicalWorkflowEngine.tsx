@@ -11,6 +11,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import WorkflowTemplateLibrary from './WorkflowTemplateLibrary';
+import WorkflowBuilder from './WorkflowBuilder';
+import WorkflowAnalytics from './WorkflowAnalytics';
+import WorkflowAutomation from './WorkflowAutomation';
 
 interface ClinicalWorkflowEngineProps {
   patientId?: string;
@@ -477,58 +481,39 @@ const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patient
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-4">
-            <ScrollArea className="h-[500px]">
-              <div className="space-y-4">
-                {workflows?.map((workflow) => (
-                  <div key={workflow.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">{workflow.workflow_name}</h4>
-                      <Badge variant="outline">{workflow.workflow_type}</Badge>
-                    </div>
-                    
-                    {workflow.description && (
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {workflow.description}
-                      </p>
-                    )}
+            <WorkflowTemplateLibrary onTemplateSelect={setSelectedWorkflow} />
+          </TabsContent>
+        </Tabs>
 
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        {Array.isArray(workflow.steps) ? workflow.steps.length : 0} steps
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          if (patientId) {
-                            startWorkflowMutation.mutate({
-                              workflowId: workflow.id,
-                              patientId
-                            });
-                          } else {
-                            toast({
-                              title: "Patient Required",
-                              description: "Please select a patient to start this workflow.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        disabled={!patientId}
-                      >
-                        <Play className="h-4 w-4 mr-1" />
-                        Start Workflow
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                {!workflows?.length && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No workflow templates available.</p>
-                    <p className="text-sm">Contact your administrator to set up clinical workflows.</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+        {/* Enhanced Template Section with New Components */}
+        <Tabs defaultValue="library" className="mt-8">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="library">Template Library</TabsTrigger>
+            <TabsTrigger value="builder">Workflow Builder</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="automation">Automation</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="library" className="space-y-4">
+            <WorkflowTemplateLibrary onTemplateSelect={setSelectedWorkflow} />
+          </TabsContent>
+
+          <TabsContent value="builder" className="space-y-4">
+            <WorkflowBuilder onSave={(workflow) => {
+              console.log('Saving workflow:', workflow);
+              toast({
+                title: "Success",
+                description: "Workflow saved successfully.",
+              });
+            }} />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <WorkflowAnalytics timeRange="30d" />
+          </TabsContent>
+
+          <TabsContent value="automation" className="space-y-4">
+            <WorkflowAutomation />
           </TabsContent>
         </Tabs>
       </CardContent>
