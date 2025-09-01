@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, DollarSign, AlertTriangle } from "lucide-react";
+import { CreditCard, Banknote, AlertTriangle } from "lucide-react";
 
 interface ProcessRefundDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export const ProcessRefundDialog = ({ open, onOpenChange }: ProcessRefundDialogP
     
     toast({
       title: "Refund Processed",
-      description: `Refund of $${formData.refundAmount} has been processed successfully.`
+      description: `Refund of ₵${formData.refundAmount} has been processed successfully.`
     });
     
     // Reset form
@@ -81,7 +81,7 @@ export const ProcessRefundDialog = ({ open, onOpenChange }: ProcessRefundDialogP
             <div className="space-y-2">
               <Label htmlFor="originalAmount">Original Amount</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Banknote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="originalAmount"
                   type="number"
@@ -97,7 +97,7 @@ export const ProcessRefundDialog = ({ open, onOpenChange }: ProcessRefundDialogP
             <div className="space-y-2">
               <Label htmlFor="refundAmount">Refund Amount</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Banknote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="refundAmount"
                   type="number"

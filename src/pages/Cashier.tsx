@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreditCard, DollarSign, Receipt, Search, Clock, CheckCircle } from 'lucide-react';
+import { CreditCard, Banknote, Receipt, Search, Clock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProcessRefundDialog } from '@/components/cashier/ProcessRefundDialog';
 
@@ -128,7 +128,7 @@ const Cashier = () => {
   const handlePayment = (invoiceNumber: string, amount: number) => {
     toast({
       title: "Payment Processed",
-      description: `Payment of $${amount.toFixed(2)} for invoice ${invoiceNumber} has been processed successfully.`
+      description: `Payment of ₵${amount.toFixed(2)} for invoice ${invoiceNumber} has been processed successfully.`
     });
   };
 
@@ -136,7 +136,7 @@ const Cashier = () => {
     e.preventDefault();
     toast({
       title: "Payment Completed",
-      description: `Payment of $${paymentForm.amount} has been processed via ${paymentForm.paymentMethod}.`
+      description: `Payment of ₵${paymentForm.amount} has been processed via ${paymentForm.paymentMethod}.`
     });
     setPaymentForm({
       patientId: '',
@@ -148,10 +148,10 @@ const Cashier = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return `₵${amount.toLocaleString('en-GH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   const filteredPayments = pendingPayments.filter(payment =>
@@ -180,7 +180,7 @@ const Cashier = () => {
                   <p className="text-sm text-muted-foreground">Today's Revenue</p>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.todayRevenue)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Banknote className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
@@ -235,7 +235,7 @@ const Cashier = () => {
                   <p className="text-sm text-muted-foreground">Cash on Hand</p>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.cashOnHand)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Banknote className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
