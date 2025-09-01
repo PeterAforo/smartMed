@@ -51,7 +51,7 @@ export function ViewReportsModal({ open, onOpenChange }: ViewReportsModalProps) 
       description: "Revenue and financial metrics overview",
       icon: DollarSign,
       data: {
-        "Today's Revenue": `$${stats?.todayRevenue?.toLocaleString() || 0}`,
+        "Today's Revenue": `₵${stats?.todayRevenue?.toLocaleString() || 0}`,
         "Monthly Target": "85% achieved",
         "Payment Collection": "94%"
       }
@@ -177,7 +177,7 @@ export function ViewReportsModal({ open, onOpenChange }: ViewReportsModalProps) 
                   <div className="text-xs text-muted-foreground">Bed Occupancy</div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-2xl font-bold text-success">${(stats?.todayRevenue || 0).toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-success">₵{(stats?.todayRevenue || 0).toLocaleString()}</div>
                   <div className="text-xs text-muted-foreground">Today's Revenue</div>
                 </div>
               </div>

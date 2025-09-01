@@ -6,7 +6,7 @@ import { useDashboardStats } from '@/hooks/useDashboardData';
 import { 
   Users, 
   Calendar, 
-  DollarSign, 
+  Banknote, 
   Bed, 
   Activity,
   TestTube,
@@ -99,9 +99,9 @@ export function RoleBasedStats() {
         id: 'revenue',
         permission: PERMISSIONS.FINANCIAL_VIEW,
         title: 'Daily Revenue',
-        value: `$${stats?.todayRevenue?.toLocaleString() || '0'}`,
+        value: `₵${stats?.todayRevenue?.toLocaleString() || '0'}`,
         description: 'Today\'s earnings',
-        icon: DollarSign,
+        icon: Banknote,
         trend: { value: 8, label: 'vs yesterday', positive: true },
       },
       {
