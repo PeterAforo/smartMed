@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calculator, DollarSign, FileText, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
+import { Calculator, Banknote, FileText, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Accounts = () => {
@@ -133,10 +133,10 @@ const Accounts = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return `₵${amount.toLocaleString('en-GH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   return (
@@ -163,7 +163,7 @@ const Accounts = () => {
                     +12.5% from yesterday
                   </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Banknote className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
@@ -391,7 +391,7 @@ const Accounts = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Button variant="outline" className="h-24 flex-col">
-                    <DollarSign className="h-6 w-6 mb-2" />
+                    <Banknote className="h-6 w-6 mb-2" />
                     <span>Revenue Report</span>
                   </Button>
                   <Button variant="outline" className="h-24 flex-col">
