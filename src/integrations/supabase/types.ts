@@ -3546,6 +3546,54 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_automation_rules: {
+        Row: {
+          action_type: string
+          actions: Json | null
+          branch_id: string | null
+          conditions: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          tenant_id: string
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          action_type: string
+          actions?: Json | null
+          branch_id?: string | null
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          tenant_id: string
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          action_type?: string
+          actions?: Json | null
+          branch_id?: string | null
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          tenant_id?: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workflow_instances: {
         Row: {
           assigned_to: string | null
@@ -3594,6 +3642,54 @@ export type Database = {
           tenant_id?: string
           updated_at?: string
           workflow_id?: string
+        }
+        Relationships: []
+      }
+      workflow_sla_configs: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          created_by: string | null
+          escalation_rules: Json | null
+          id: string
+          is_active: boolean | null
+          notification_settings: Json | null
+          sla_name: string
+          target_duration_hours: number
+          tenant_id: string
+          updated_at: string
+          warning_threshold_hours: number
+          workflow_type: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          escalation_rules?: Json | null
+          id?: string
+          is_active?: boolean | null
+          notification_settings?: Json | null
+          sla_name: string
+          target_duration_hours?: number
+          tenant_id: string
+          updated_at?: string
+          warning_threshold_hours?: number
+          workflow_type: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          escalation_rules?: Json | null
+          id?: string
+          is_active?: boolean | null
+          notification_settings?: Json | null
+          sla_name?: string
+          target_duration_hours?: number
+          tenant_id?: string
+          updated_at?: string
+          warning_threshold_hours?: number
+          workflow_type?: string
         }
         Relationships: []
       }

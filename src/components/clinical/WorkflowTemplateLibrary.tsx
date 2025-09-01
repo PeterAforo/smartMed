@@ -11,7 +11,7 @@ import { Plus, Clock, Users, AlertTriangle, FileText, Stethoscope, Pill } from '
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 // Pre-built workflow templates
 const WORKFLOW_TEMPLATES = [
@@ -113,7 +113,6 @@ interface WorkflowTemplateLibraryProps {
 
 const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTemplateSelect }) => {
   const { profile, currentBranch } = useAuth();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [isCustomizing, setIsCustomizing] = useState(false);
@@ -148,21 +147,14 @@ const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTem
       return data;
     },
     onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Workflow template created successfully.",
-      });
+      toast.success('Workflow template created successfully');
       queryClient.invalidateQueries({ queryKey: ['clinical-workflows'] });
       setIsCustomizing(false);
       setSelectedTemplate(null);
     },
     onError: (error) => {
       console.error('Error creating workflow:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create workflow template.",
-        variant: "destructive",
-      });
+      toast.error('Failed to create workflow template');
     }
   });
 
@@ -319,8 +311,8 @@ const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTem
                         <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                           <span>{step.name}</span>
-                          <Badge variant="outline" size="sm">{step.role}</Badge>
-                          <Badge variant="secondary" size="sm">{step.duration}min</Badge>
+                          <Badge variant="outline">{step.role}</Badge>
+                          <Badge variant="secondary">{step.duration}min</Badge>
                         </div>
                       ))}
                       {template.steps.length > 3 && (
@@ -373,10 +365,10 @@ const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTem
                                     <div>
                                       <div className="font-medium text-sm">{step.name}</div>
                                       <div className="flex items-center gap-2 mt-1">
-                                        <Badge variant="outline" size="sm">{step.role}</Badge>
-                                        <Badge variant="secondary" size="sm">{step.duration} min</Badge>
+                                        <Badge variant="outline">{step.role}</Badge>
+                                        <Badge variant="secondary">{step.duration} min</Badge>
                                         {step.required && (
-                                          <Badge variant="destructive" size="sm">Required</Badge>
+                                          <Badge variant="destructive">Required</Badge>
                                         )}
                                       </div>
                                     </div>

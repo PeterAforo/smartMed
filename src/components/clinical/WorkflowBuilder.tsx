@@ -34,7 +34,7 @@ const WorkflowStepNode = ({ data }: { data: any }) => {
         <div className="text-xs text-gray-500">{data.role}</div>
         <div className="text-xs text-gray-400">{data.duration}min</div>
         {data.required && (
-          <Badge variant="destructive" size="sm" className="mt-1 w-fit">
+          <Badge variant="destructive" className="mt-1 w-fit">
             Required
           </Badge>
         )}
@@ -113,9 +113,9 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
   );
 
   const addWorkflowStep = () => {
-    const newNode: Node = {
+    const newNode = {
       id: `step-${Date.now()}`,
-      type: 'workflowStep',
+      type: 'workflowStep' as const,
       position: { x: Math.random() * 400 + 200, y: Math.random() * 300 + 200 },
       data: {
         label: 'New Step',
@@ -125,32 +125,32 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
         instructions: '',
       },
     };
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => [...nds, newNode]);
   };
 
   const addDecisionNode = () => {
-    const newNode: Node = {
+    const newNode = {
       id: `decision-${Date.now()}`,
-      type: 'decision',
+      type: 'decision' as const,
       position: { x: Math.random() * 400 + 200, y: Math.random() * 300 + 200 },
       data: {
         label: 'Decision Point',
         condition: 'Condition',
       },
     };
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => [...nds, newNode]);
   };
 
   const addEndNode = () => {
-    const newNode: Node = {
+    const newNode = {
       id: `end-${Date.now()}`,
-      type: 'end',
+      type: 'end' as const,
       position: { x: Math.random() * 400 + 200, y: Math.random() * 300 + 400 },
       data: {
         label: 'End Workflow',
       },
     };
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => [...nds, newNode]);
   };
 
   const deleteNode = (nodeId: string) => {
@@ -176,12 +176,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
       steps: nodes
         .filter(node => node.type === 'workflowStep')
         .map((node, index) => ({
-          name: node.data.label,
+          name: (node.data as any).label,
           order: index + 1,
-          role: node.data.role,
-          duration: node.data.duration,
-          required: node.data.required,
-          instructions: node.data.instructions,
+          role: (node.data as any).role,
+          duration: (node.data as any).duration,
+          required: (node.data as any).required,
+          instructions: (node.data as any).instructions,
         })),
     };
     
@@ -311,14 +311,14 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
                     <Label htmlFor="stepName">Step Name</Label>
                     <Input
                       id="stepName"
-                      value={selectedNode.data.label}
+                      value={(selectedNode.data as any).label || ''}
                       onChange={(e) => updateNodeData(selectedNode.id, { label: e.target.value })}
                     />
                   </div>
                   <div>
                     <Label htmlFor="stepRole">Assigned Role</Label>
                     <Select
-                      value={selectedNode.data.role}
+                      value={(selectedNode.data as any).role || ''}
                       onValueChange={(value) => updateNodeData(selectedNode.id, { role: value })}
                     >
                       <SelectTrigger>
@@ -340,7 +340,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
                     <Input
                       id="stepDuration"
                       type="number"
-                      value={selectedNode.data.duration}
+                      value={(selectedNode.data as any).duration || ''}
                       onChange={(e) => updateNodeData(selectedNode.id, { duration: parseInt(e.target.value) })}
                     />
                   </div>
@@ -348,7 +348,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
                     <Label htmlFor="stepInstructions">Instructions</Label>
                     <Textarea
                       id="stepInstructions"
-                      value={selectedNode.data.instructions || ''}
+                      value={(selectedNode.data as any).instructions || ''}
                       onChange={(e) => updateNodeData(selectedNode.id, { instructions: e.target.value })}
                       rows={3}
                     />
@@ -362,7 +362,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
                     <Label htmlFor="decisionLabel">Decision Label</Label>
                     <Input
                       id="decisionLabel"
-                      value={selectedNode.data.label}
+                      value={(selectedNode.data as any).label || ''}
                       onChange={(e) => updateNodeData(selectedNode.id, { label: e.target.value })}
                     />
                   </div>
@@ -370,7 +370,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, initialWorkfl
                     <Label htmlFor="decisionCondition">Condition</Label>
                     <Input
                       id="decisionCondition"
-                      value={selectedNode.data.condition}
+                      value={(selectedNode.data as any).condition || ''}
                       onChange={(e) => updateNodeData(selectedNode.id, { condition: e.target.value })}
                     />
                   </div>

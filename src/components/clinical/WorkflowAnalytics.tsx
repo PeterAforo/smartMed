@@ -34,11 +34,7 @@ const WorkflowAnalytics: React.FC<WorkflowAnalyticsProps> = ({ timeRange = '30d'
       // Fetch workflow instances with completion data
       let query = supabase
         .from('workflow_instances')
-        .select(`
-          *,
-          workflow:clinical_workflows(workflow_name, workflow_type),
-          patient:patients(first_name, last_name)
-        `)
+        .select('*')
         .eq('tenant_id', profile.tenant_id)
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString());
@@ -70,12 +66,7 @@ const WorkflowAnalytics: React.FC<WorkflowAnalyticsProps> = ({ timeRange = '30d'
 
       const { data, error } = await supabase
         .from('workflow_tasks')
-        .select(`
-          *,
-          workflow_instance:workflow_instances(
-            workflow:clinical_workflows(workflow_name)
-          )
-        `)
+        .select('*')
         .eq('tenant_id', profile.tenant_id)
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString());
@@ -110,9 +101,9 @@ const WorkflowAnalytics: React.FC<WorkflowAnalyticsProps> = ({ timeRange = '30d'
         }, 0) / completedWorkflowsWithTime.length
       : 0;
 
-    // Group workflows by type
+    // Group workflows by type (simplified)
     const workflowsByType = performanceData.reduce((acc, w) => {
-      const type = w.workflow?.workflow_type || 'Unknown';
+      const type = 'Standard'; // Simplified for now since we don't have the relationship
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
