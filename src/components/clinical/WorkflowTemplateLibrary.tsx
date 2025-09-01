@@ -194,7 +194,7 @@ const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTem
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Workflow Templates</h3>
+        <h3 className="text-lg font-semibold">Pre-built Workflow Templates</h3>
         <Dialog open={isCustomizing} onOpenChange={setIsCustomizing}>
           <DialogTrigger asChild>
             <Button onClick={() => setIsCustomizing(true)}>

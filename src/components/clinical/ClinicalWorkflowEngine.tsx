@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Play, Pause, CheckCircle, Clock, User, AlertCircle, Plus } from 'lucide-react';
+import { Play, Pause, CheckCircle, Clock, User, AlertCircle, Plus, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -488,27 +488,50 @@ const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patient
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-4">
-            <div className="space-y-6">
-              <WorkflowTemplateLibrary />
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">My Custom Workflows</h3>
-                <CustomWorkflowsList workflows={workflows} />
+            <ScrollArea className="h-[80vh]">
+              <div className="space-y-6 pr-4">
+                <WorkflowTemplateLibrary />
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      My Custom Workflows
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CustomWorkflowsList workflows={workflows} />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Workflow Builder</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <WorkflowBuilder />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Analytics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <WorkflowAnalytics />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Automation</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <WorkflowAutomation />
+                  </CardContent>
+                </Card>
               </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Workflow Builder</h3>
-                <WorkflowBuilder />
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Analytics</h3>
-                <WorkflowAnalytics />
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Automation</h3>
-                <WorkflowAutomation />
-              </div>
-            </div>
+            </ScrollArea>
           </TabsContent>
         </Tabs>
       </CardContent>
