@@ -147,7 +147,7 @@ const WorkflowTemplateLibrary: React.FC<WorkflowTemplateLibraryProps> = ({ onTem
       return data;
     },
     onSuccess: () => {
-      toast.success('Workflow template created successfully');
+      toast.success('Workflow template created successfully! You can now find it in the "My Custom Workflows" section and use it to start workflow instances.');
       queryClient.invalidateQueries({ queryKey: ['clinical-workflows'] });
       setIsCustomizing(false);
       setSelectedTemplate(null);

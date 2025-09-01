@@ -6,7 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Play, Pause, CheckCircle, Clock, User, AlertCircle } from 'lucide-react';
+import { Play, Pause, CheckCircle, Clock, User, AlertCircle, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -329,7 +332,11 @@ const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patient
           </TabsList>
 
           <TabsContent value="active" className="space-y-4">
-            <ScrollArea className="h-[500px]">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Active Workflows</h3>
+              <StartWorkflowDialog workflows={workflows} />
+            </div>
+            <ScrollArea className="h-[450px]">
               <div className="space-y-4">
                 {workflowInstances?.map((instance) => (
                   <div key={instance.id} className="border rounded-lg p-4">
@@ -481,43 +488,231 @@ const ClinicalWorkflowEngine: React.FC<ClinicalWorkflowEngineProps> = ({ patient
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-4">
-            <WorkflowTemplateLibrary onTemplateSelect={setSelectedWorkflow} />
-          </TabsContent>
-        </Tabs>
-
-        {/* Enhanced Template Section with New Components */}
-        <Tabs defaultValue="library" className="mt-8">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="library">Template Library</TabsTrigger>
-            <TabsTrigger value="builder">Workflow Builder</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="automation">Automation</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="library" className="space-y-4">
-            <WorkflowTemplateLibrary onTemplateSelect={setSelectedWorkflow} />
-          </TabsContent>
-
-          <TabsContent value="builder" className="space-y-4">
-            <WorkflowBuilder onSave={(workflow) => {
-              console.log('Saving workflow:', workflow);
-              toast({
-                title: "Success",
-                description: "Workflow saved successfully.",
-              });
-            }} />
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4">
-            <WorkflowAnalytics timeRange="30d" />
-          </TabsContent>
-
-          <TabsContent value="automation" className="space-y-4">
-            <WorkflowAutomation />
+            <div className="space-y-6">
+              <WorkflowTemplateLibrary />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">My Custom Workflows</h3>
+                <CustomWorkflowsList workflows={workflows} />
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Workflow Builder</h3>
+                <WorkflowBuilder />
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Analytics</h3>
+                <WorkflowAnalytics />
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Automation</h3>
+                <WorkflowAutomation />
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
+  );
+};
+
+// Start Workflow Dialog Component
+const StartWorkflowDialog: React.FC<{ workflows?: any[] }> = ({ workflows }) => {
+  const { profile, currentBranch } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedWorkflow, setSelectedWorkflow] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState('');
+  const [patients, setPatients] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Fetch patients when dialog opens
+  const fetchPatients = async () => {
+    if (!profile?.tenant_id) return;
+    
+    const { data, error } = await supabase
+      .from('patients')
+      .select('id, first_name, last_name, patient_number')
+      .eq('tenant_id', profile.tenant_id)
+      .limit(50)
+      .order('created_at', { ascending: false });
+    
+    if (!error && data) {
+      setPatients(data);
+    }
+  };
+
+  const startWorkflowMutation = useMutation({
+    mutationFn: async () => {
+      if (!profile?.tenant_id || !currentBranch?.id || !selectedWorkflow || !selectedPatient) {
+        throw new Error('Missing required data');
+      }
+
+      const { data, error } = await supabase
+        .from('workflow_instances')
+        .insert({
+          workflow_id: selectedWorkflow,
+          patient_id: selectedPatient,
+          tenant_id: profile.tenant_id,
+          branch_id: currentBranch.id,
+          assigned_to: profile.user_id,
+          status: 'active'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Workflow instance started successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['workflow-instances'] });
+      setSelectedWorkflow('');
+      setSelectedPatient('');
+      setIsOpen(false);
+    },
+    onError: (error) => {
+      console.error('Error starting workflow:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start workflow. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button onClick={() => { setIsOpen(true); fetchPatients(); }}>
+          <Plus className="h-4 w-4 mr-2" />
+          Start Workflow
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Start New Workflow</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="workflow">Select Workflow</Label>
+            <Select value={selectedWorkflow} onValueChange={setSelectedWorkflow}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a workflow" />
+              </SelectTrigger>
+              <SelectContent>
+                {workflows?.map((workflow) => (
+                  <SelectItem key={workflow.id} value={workflow.id}>
+                    {workflow.workflow_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="patient">Select Patient</Label>
+            <Select value={selectedPatient} onValueChange={setSelectedPatient}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    {patient.first_name} {patient.last_name} ({patient.patient_number})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => startWorkflowMutation.mutate()}
+              disabled={!selectedWorkflow || !selectedPatient || startWorkflowMutation.isPending}
+            >
+              Start Workflow
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Custom Workflows List Component
+const CustomWorkflowsList: React.FC<{ workflows?: any[] }> = ({ workflows }) => {
+  const { profile } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const deleteWorkflowMutation = useMutation({
+    mutationFn: async (workflowId: string) => {
+      const { error } = await supabase
+        .from('clinical_workflows')
+        .update({ is_active: false })
+        .eq('id', workflowId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Workflow deactivated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['clinical-workflows'] });
+    }
+  });
+
+  if (!workflows?.length) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center text-muted-foreground">
+            <p>No custom workflows created yet.</p>
+            <p className="text-sm mt-1">Use the templates above or create a custom workflow to get started.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <ScrollArea className="h-[300px]">
+      <div className="space-y-3">
+        {workflows.map((workflow) => (
+          <Card key={workflow.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">{workflow.workflow_name}</h4>
+                  <p className="text-sm text-muted-foreground">{workflow.description}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge variant="outline">{workflow.workflow_type}</Badge>
+                    <Badge variant="secondary">
+                      {Array.isArray(workflow.steps) ? workflow.steps.length : 0} steps
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => deleteWorkflowMutation.mutate(workflow.id)}
+                  >
+                    Deactivate
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </ScrollArea>
   );
 };
 
