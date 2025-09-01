@@ -3943,6 +3943,47 @@ export type Database = {
           unique_patients: number
         }[]
       }
+      get_appointment_type_analytics: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          appointment_type: string
+          avg_duration: number
+          branch_id: string
+          completed_count: number
+          count: number
+          month: string
+          tenant_id: string
+        }[]
+      }
+      get_daily_appointments_analytics: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          avg_duration: number
+          branch_id: string
+          cancelled_appointments: number
+          completed_appointments: number
+          date: string
+          emergency_appointments: number
+          no_show_appointments: number
+          tenant_id: string
+          total_appointments: number
+          unique_patients: number
+        }[]
+      }
+      get_monthly_revenue_analytics: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          avg_transaction_amount: number
+          branch_id: string
+          month: string
+          paid_revenue: number
+          pending_revenue: number
+          tenant_id: string
+          total_revenue: number
+          total_transactions: number
+          unique_patients: number
+        }[]
+      }
       get_patient_flow_analytics: {
         Args: {
           end_date: string
@@ -3956,6 +3997,31 @@ export type Database = {
           new_patients: number
           pediatric_patients: number
           senior_patients: number
+        }[]
+      }
+      get_patient_flow_analytics_secure: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          active_patients: number
+          branch_id: string
+          month: string
+          new_patients: number
+          pediatric_patients: number
+          senior_patients: number
+          tenant_id: string
+        }[]
+      }
+      get_queue_performance_analytics: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          avg_wait_time: number
+          branch_id: string
+          completed_entries: number
+          date: string
+          max_wait_time: number
+          no_show_entries: number
+          tenant_id: string
+          total_queue_entries: number
         }[]
       }
       get_revenue_analytics: {
@@ -3973,6 +4039,21 @@ export type Database = {
           total_revenue: number
           total_transactions: number
           unique_patients: number
+        }[]
+      }
+      get_staff_performance_analytics: {
+        Args: { target_branch_id?: string; target_tenant_id?: string }
+        Returns: {
+          avg_appointment_duration: number
+          branch_id: string
+          completed_appointments: number
+          month: string
+          revenue_generated: number
+          staff_id: string
+          staff_name: string
+          tenant_id: string
+          total_appointments: number
+          unique_patients_served: number
         }[]
       }
       get_user_branch_ids: {
