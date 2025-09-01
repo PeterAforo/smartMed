@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Search, FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { Shield, Search, FileText, Banknote, Clock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Insurance = () => {
@@ -174,10 +174,10 @@ const Insurance = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return `₵${amount.toLocaleString('en-GH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   const filteredPolicies = insurancePolicies.filter(policy =>
@@ -251,7 +251,7 @@ const Insurance = () => {
                   <p className="text-sm text-muted-foreground">Total Coverage</p>
                   <p className="text-2xl font-bold text-blue-600">{formatCurrency(stats.totalCoverage)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-blue-600" />
+                <Banknote className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -262,7 +262,7 @@ const Insurance = () => {
                   <p className="text-sm text-muted-foreground">Monthly Premiums</p>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.monthlyPremiums)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <Banknote className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
