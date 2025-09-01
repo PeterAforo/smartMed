@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartLegend, appointmentChartConfig, revenueChartConfig, patientChartConfig } from "@/components/ui/chart";
+import { formatCurrency } from "@/lib/utils";
 import { 
   LineChart, 
   Line, 
@@ -135,11 +136,11 @@ export function RevenueTrendsChart({ data, isLoading }: RevenueTrendsChartProps)
               <YAxis 
                 className="text-muted-foreground text-xs"
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                tickFormatter={(value) => formatCurrency(value / 1000, { compact: true, showSymbol: false }) + 'k'}
               />
               <Tooltip 
                 content={<ChartTooltip config={revenueChartConfig} />}
-                formatter={(value) => [`$${Number(value).toLocaleString()}`, '']}
+                formatter={(value) => [formatCurrency(Number(value)), '']}
               />
               <Legend content={<ChartLegend config={revenueChartConfig} />} />
               <Line 

@@ -17,6 +17,7 @@ import {
 import { MiniChart } from '@/components/analytics/MiniChart';
 import { useAnalyticsDashboard } from '@/hooks/useAnalytics';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '@/lib/utils';
 
 interface QuickMetricProps {
   title: string;
@@ -92,7 +93,7 @@ export function DashboardAnalyticsSection() {
     },
     {
       title: 'Revenue Today',
-      value: `$${(safeRevenue.data?.[0]?.total_revenue || 0).toLocaleString()}`,
+      value: formatCurrency(safeRevenue.data?.[0]?.total_revenue || 0),
       change: { value: 12.5, positive: true },
       data: safeRevenue.data || [],
       dataKey: 'total_revenue',

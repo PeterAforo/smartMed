@@ -28,6 +28,8 @@ import {
   PieChart,
   BarChart3
 } from 'lucide-react';
+import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
 
 interface Invoice {
   id: string;
@@ -259,7 +261,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
               <DollarSign className="h-5 w-5 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">${totalRevenue.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
                 <p className="text-xs text-green-600">+12% from last month</p>
               </div>
             </div>
@@ -272,7 +274,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
               <CheckCircle className="h-5 w-5 text-blue-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Collected</p>
-                <p className="text-2xl font-bold">${totalPaid.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalPaid)}</p>
                 <p className="text-xs text-blue-600">{Math.round((totalPaid / totalRevenue) * 100)}% of total</p>
               </div>
             </div>
@@ -285,7 +287,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
               <Clock className="h-5 w-5 text-yellow-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Outstanding</p>
-                <p className="text-2xl font-bold">${totalOutstanding.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalOutstanding)}</p>
                 <p className="text-xs text-yellow-600">{Math.round((totalOutstanding / totalRevenue) * 100)}% pending</p>
               </div>
             </div>
@@ -298,7 +300,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
               <AlertCircle className="h-5 w-5 text-red-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Overdue</p>
-                <p className="text-2xl font-bold">${overdueAmount.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{formatCurrency(overdueAmount)}</p>
                 <p className="text-xs text-red-600">Requires follow-up</p>
               </div>
             </div>
@@ -394,13 +396,13 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
                         </TableCell>
                         <TableCell>{new Date(invoice.dateIssued).toLocaleDateString()}</TableCell>
                         <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                        <TableCell>${invoice.amount.toFixed(2)}</TableCell>
+                        <TableCell>{formatCurrency(invoice.amount)}</TableCell>
                         <TableCell>
                           <div>
-                            <p className="font-medium">${invoice.paidAmount.toFixed(2)}</p>
+                            <p className="font-medium">{formatCurrency(invoice.paidAmount)}</p>
                             {invoice.amount > invoice.paidAmount && (
                               <p className="text-sm text-red-600">
-                                ${(invoice.amount - invoice.paidAmount).toFixed(2)} due
+                                {formatCurrency(invoice.amount - invoice.paidAmount)} due
                               </p>
                             )}
                           </div>
@@ -453,7 +455,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
                       <TableRow key={payment.id}>
                         <TableCell className="font-medium">{payment.transactionId}</TableCell>
                         <TableCell>{payment.invoiceId.toUpperCase()}</TableCell>
-                        <TableCell>${payment.amount.toFixed(2)}</TableCell>
+                        <TableCell>{formatCurrency(payment.amount)}</TableCell>
                         <TableCell>{getPaymentMethodBadge(payment.method)}</TableCell>
                         <TableCell>{payment.processedBy}</TableCell>
                         <TableCell>{new Date(payment.timestamp).toLocaleString()}</TableCell>
@@ -503,22 +505,22 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-green-600">${totalRevenue.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-green-600">{formatCurrency(totalRevenue)}</p>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-xs text-green-600">+12% vs last month</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-blue-600">${totalPaid.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-blue-600">{formatCurrency(totalPaid)}</p>
                   <p className="text-sm text-muted-foreground">Collections</p>
                   <p className="text-xs text-blue-600">{Math.round((totalPaid / totalRevenue) * 100)}% collection rate</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-yellow-600">${totalOutstanding.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-yellow-600">{formatCurrency(totalOutstanding)}</p>
                   <p className="text-sm text-muted-foreground">Outstanding</p>
                   <p className="text-xs text-yellow-600">Accounts receivable</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-red-600">${overdueAmount.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-red-600">{formatCurrency(overdueAmount)}</p>
                   <p className="text-sm text-muted-foreground">Overdue</p>
                   <p className="text-xs text-red-600">Needs attention</p>
                 </div>
@@ -606,7 +608,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
                   </div>
                   <div className="flex justify-between">
                     <span>Actual Revenue</span>
-                    <span className="font-bold text-green-600">${totalRevenue.toLocaleString()}</span>
+                    <span className="font-bold text-green-600">{formatCurrency(totalRevenue)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Collection Rate</span>

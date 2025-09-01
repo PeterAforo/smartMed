@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStats } from "@/hooks/useDashboardData";
+import { formatCurrency } from "@/lib/utils";
 
 interface StatCardProps {
   title: string;
@@ -136,7 +137,7 @@ export default function DashboardStats() {
     },
     {
       title: "Today's Revenue", 
-      value: `$${statsData?.todayRevenue?.toLocaleString() || "0"}`,
+      value: formatCurrency(statsData?.todayRevenue || 0),
       change: "+18.2%",
       trend: 'up' as const,
       icon: Activity,
