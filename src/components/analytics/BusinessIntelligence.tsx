@@ -31,8 +31,8 @@ const BusinessIntelligence = () => {
       label: 'Revenue Growth', 
       value: '+12.5%', 
       trend: 'up', 
-      amount: '$2.4M',
-      previousPeriod: '$2.1M'
+      amount: '₵2.4M',
+      previousPeriod: '₵2.1M'
     },
     { 
       label: 'Patient Satisfaction', 
@@ -52,8 +52,8 @@ const BusinessIntelligence = () => {
       label: 'Cost per Patient', 
       value: '-5.7%', 
       trend: 'down', 
-      amount: '$235',
-      previousPeriod: '$249'
+      amount: '₵235',
+      previousPeriod: '₵249'
     }
   ];
 
@@ -222,7 +222,7 @@ const BusinessIntelligence = () => {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
-                      <Tooltip formatter={(value: any) => [`$${value.toLocaleString()}`, 'Revenue']} />
+                      <Tooltip formatter={(value: any) => [`₵${value.toLocaleString()}`, 'Revenue']} />
                       <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} />
                     </RechartsLineChart>
                   </ResponsiveContainer>
@@ -338,7 +338,7 @@ const BusinessIntelligence = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <h4 className="font-medium">Revenue Forecast</h4>
-                  <div className="text-2xl font-bold">$3.2M</div>
+                  <div className="text-2xl font-bold">₵3.2M</div>
                   <p className="text-sm text-muted-foreground">Next quarter projection</p>
                   <Progress value={85} className="h-2" />
                   <p className="text-xs text-green-600">85% confidence</p>

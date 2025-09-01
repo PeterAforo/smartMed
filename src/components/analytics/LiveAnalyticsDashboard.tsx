@@ -188,7 +188,7 @@ export function LiveAnalyticsDashboard({ className }: LiveAnalyticsDashboardProp
           color="hsl(var(--success))"
           isLive={isLive}
           icon={DollarSign}
-          formatter={(value) => `$${value.toLocaleString()}`}
+          formatter={(value) => `₵${value.toLocaleString()}`}
         />
       </div>
 

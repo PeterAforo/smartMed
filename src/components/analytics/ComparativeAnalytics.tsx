@@ -112,7 +112,7 @@ export function ComparativeAnalytics() {
   const formatValue = (value: number, format: ComparisonMetric['format']) => {
     switch (format) {
       case 'currency':
-        return `$${value.toLocaleString()}`;
+        return `₵${value.toLocaleString()}`;
       case 'percentage':
         return `${value.toFixed(1)}%`;
       case 'time':

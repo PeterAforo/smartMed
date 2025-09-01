@@ -128,7 +128,7 @@ export default function AIInsights() {
       insight_type: 'financial',
       priority: 'medium',
       title: 'Revenue Opportunity',
-      description: 'Bed utilization is at 75%. Increasing to 85% could generate an additional $15K monthly revenue.',
+      description: 'Bed utilization is at 75%. Increasing to 85% could generate an additional ₵15K monthly revenue.',
       confidence_score: 0.76,
       is_actionable: true,
       action_taken: false,

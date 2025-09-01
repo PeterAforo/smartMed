@@ -537,9 +537,9 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { claimId: 'CLM-2024-001', patient: 'Sarah Johnson', amount: '$850', status: 'approved', date: '2024-01-20' },
-                  { claimId: 'CLM-2024-002', patient: 'Michael Chen', amount: '$600', status: 'pending', date: '2024-01-18' },
-                  { claimId: 'CLM-2024-003', patient: 'Emily Davis', amount: '$2500', status: 'rejected', date: '2024-01-15' }
+                  { claimId: 'CLM-2024-001', patient: 'Sarah Johnson', amount: '₵850', status: 'approved', date: '2024-01-20' },
+                  { claimId: 'CLM-2024-002', patient: 'Michael Chen', amount: '₵600', status: 'pending', date: '2024-01-18' },
+                  { claimId: 'CLM-2024-003', patient: 'Emily Davis', amount: '₵2500', status: 'rejected', date: '2024-01-15' }
                 ].map((claim) => (
                   <div key={claim.claimId} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
@@ -604,7 +604,7 @@ const FinancialManager = ({ className }: FinancialManagerProps) => {
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span>Revenue Target</span>
-                    <span className="font-bold">$15,000</span>
+                    <span className="font-bold">₵15,000</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Actual Revenue</span>

@@ -406,9 +406,9 @@ const InventoryManager = ({ className }: InventoryManagerProps) => {
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { id: 'PO-001', supplier: 'PharmaCorp Ltd', total: '$2,450', status: 'pending', date: '2024-01-20' },
-                  { id: 'PO-002', supplier: 'SurgicalPro', total: '$1,800', status: 'approved', date: '2024-01-19' },
-                  { id: 'PO-003', supplier: 'LabTech Solutions', total: '$950', status: 'delivered', date: '2024-01-18' }
+                  { id: 'PO-001', supplier: 'PharmaCorp Ltd', total: '₵2,450', status: 'pending', date: '2024-01-20' },
+                  { id: 'PO-002', supplier: 'SurgicalPro', total: '₵1,800', status: 'approved', date: '2024-01-19' },
+                  { id: 'PO-003', supplier: 'LabTech Solutions', total: '₵950', status: 'delivered', date: '2024-01-18' }
                 ].map((order) => (
                   <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
@@ -517,11 +517,11 @@ const InventoryManager = ({ className }: InventoryManagerProps) => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">$12,450</p>
+                  <p className="text-2xl font-bold text-green-600">₵12,450</p>
                   <p className="text-sm text-muted-foreground">Monthly Purchases</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">$8,920</p>
+                  <p className="text-2xl font-bold text-blue-600">₵8,920</p>
                   <p className="text-sm text-muted-foreground">Inventory Value</p>
                 </div>
                 <div className="text-center">

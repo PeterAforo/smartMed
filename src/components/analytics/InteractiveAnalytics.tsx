@@ -85,7 +85,7 @@ export function InteractiveAnalytics() {
       },
       {
         title: 'Revenue Generated',
-        value: `$${totalRevenue.toLocaleString()}`,
+        value: `₵${totalRevenue.toLocaleString()}`,
         description: 'Total revenue earned',
         icon: DollarSign,
         trend: { value: 12.5, positive: true, label: 'vs previous period' },

@@ -188,13 +188,13 @@ export const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ dateRa
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-muted-foreground">Current</span>
                   <span className="text-sm font-medium">
-                    {selectedMetric === 'revenue' ? '$' : ''}{currentMetricData?.current.toLocaleString()}
+                    {selectedMetric === 'revenue' ? '₵' : ''}{currentMetricData?.current.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-muted-foreground">Predicted</span>
                   <span className="text-sm font-medium text-primary">
-                    {selectedMetric === 'revenue' ? '$' : ''}{currentMetricData?.predicted.toLocaleString()}
+                    {selectedMetric === 'revenue' ? '₵' : ''}{currentMetricData?.predicted.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

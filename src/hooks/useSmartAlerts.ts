@@ -80,7 +80,7 @@ export function useSmartAlerts() {
           id: '3',
           type: 'info',
           title: 'Revenue Target Achieved',
-          message: 'Daily revenue target of $15,000 has been reached.',
+          message: 'Daily revenue target of ₵15,000 has been reached.',
           timestamp: new Date(currentTime.getTime() - 30 * 60 * 1000), // 30 minutes ago
           category: 'revenue',
           priority: 'low',

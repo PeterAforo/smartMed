@@ -289,7 +289,7 @@ export const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ dateRang
               <Users className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">Revenue/Patient</span>
             </div>
-            <div className="text-2xl font-bold">${performanceData?.kpis.revenuePerPatient}</div>
+            <div className="text-2xl font-bold">₵{performanceData?.kpis.revenuePerPatient}</div>
           </CardContent>
         </Card>
 
