@@ -72,10 +72,21 @@ export function DashboardAnalyticsSection() {
     revenue, 
     patientFlow, 
     queuePerformance,
+    realtime,
     isLoading 
   } = useAnalyticsDashboard();
 
-  // Add null checks to prevent undefined data access
+  // Use real-time data when available, fallback to historical data
+  const realtimeStats = realtime?.data || {
+    appointments_today: 0,
+    revenue_today: 0,
+    patients_today: 0,
+    queue_length: 0,
+    avg_wait_time: 0,
+    staff_online: 0,
+    new_patients_today: 0,
+    completed_appointments: 0
+  };
   const safeAppointments = appointments || { data: [] };
   const safeRevenue = revenue || { data: [] };
   const safePatientFlow = patientFlow || { data: [] };
@@ -83,8 +94,8 @@ export function DashboardAnalyticsSection() {
 
   const quickMetrics = [
     {
-      title: 'Daily Appointments',
-      value: safeAppointments.data?.[0]?.completed_appointments || 0,
+      title: 'Today\'s Appointments',
+      value: realtimeStats.completed_appointments || safeAppointments.data?.[0]?.completed_appointments || 0,
       change: { value: 8.2, positive: true },
       data: safeAppointments.data || [],
       dataKey: 'completed_appointments',
@@ -93,7 +104,7 @@ export function DashboardAnalyticsSection() {
     },
     {
       title: 'Revenue Today',
-      value: formatCurrency(safeRevenue.data?.[0]?.total_revenue || 0),
+      value: formatCurrency(realtimeStats.revenue_today || safeRevenue.data?.[0]?.paid_revenue || 0),
       change: { value: 12.5, positive: true },
       data: safeRevenue.data || [],
       dataKey: 'total_revenue',
@@ -101,8 +112,8 @@ export function DashboardAnalyticsSection() {
       onClick: () => navigate('/reports?tab=revenue')
     },
     {
-      title: 'New Patients',
-      value: safePatientFlow.data?.[0]?.new_patients || 0,
+      title: 'New Patients Today',
+      value: realtimeStats.new_patients_today || safePatientFlow.data?.[0]?.new_patients || 0,
       change: { value: 5.1, positive: true },
       data: safePatientFlow.data || [],
       dataKey: 'new_patients',  
@@ -110,9 +121,9 @@ export function DashboardAnalyticsSection() {
       onClick: () => navigate('/patients')
     },
     {
-      title: 'Queue Performance',
-      value: `${Math.round((safeQueuePerformance.data?.[0]?.avg_wait_time || 0) / 60)}min`,
-      change: { value: 2.3, positive: false },
+      title: 'Current Queue',
+      value: `${realtimeStats.queue_length || 0} waiting`,
+      change: { value: Math.round((realtimeStats.avg_wait_time || safeQueuePerformance.data?.[0]?.avg_wait_time || 0)), positive: false },
       data: safeQueuePerformance.data || [],
       dataKey: 'avg_wait_time',
       icon: Activity,
@@ -197,20 +208,20 @@ export function DashboardAnalyticsSection() {
             <div className="p-3 bg-success/5 border border-success/20 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-2 h-2 bg-success rounded-full" />
-                <span className="text-sm font-medium text-success-foreground">Appointments</span>
+                <span className="text-sm font-medium text-success-foreground">Live Updates</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                12% increase in completed appointments compared to yesterday
+                {realtimeStats.staff_online || 0} staff online • {realtimeStats.appointments_today || 0} total appointments today
               </p>
             </div>
             
             <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-2 h-2 bg-primary rounded-full" />
-                <span className="text-sm font-medium text-primary-foreground">Revenue</span>
+                <span className="text-sm font-medium text-primary-foreground">Performance</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Revenue is trending 8% above the monthly average
+                Avg wait time: {Math.round(realtimeStats.avg_wait_time || 0)}min • {realtimeStats.patients_today || 0} patients seen today
               </p>
             </div>
           </div>

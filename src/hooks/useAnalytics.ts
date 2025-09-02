@@ -58,6 +58,17 @@ export interface QueuePerformance {
   no_show_entries: number;
 }
 
+export interface RealtimeDashboardStats {
+  appointments_today: number;
+  revenue_today: number;
+  patients_today: number;
+  queue_length: number;
+  avg_wait_time: number;
+  staff_online: number;
+  new_patients_today: number;
+  completed_appointments: number;
+}
+
 // Hook for appointment analytics
 export function useAppointmentAnalytics(
   startDate: Date = subDays(new Date(), 30),
@@ -232,6 +243,37 @@ export function useQueuePerformance(
   });
 }
 
+// Hook for real-time dashboard stats
+export function useRealtimeDashboard() {
+  const { currentBranch, hasCrossBranchAccess, tenant } = useAuth();
+
+  return useQuery({
+    queryKey: ['realtime-dashboard', currentBranch?.id, hasCrossBranchAccess],
+    queryFn: async (): Promise<RealtimeDashboardStats> => {
+      if (!tenant || !currentBranch) throw new Error('No tenant or branch found');
+
+      const { data, error } = await supabase.rpc('get_realtime_dashboard_stats', {
+        target_tenant_id: tenant.id,
+        target_branch_id: hasCrossBranchAccess ? null : currentBranch.id,
+      });
+
+      if (error) throw error;
+      return data?.[0] || {
+        appointments_today: 0,
+        revenue_today: 0,
+        patients_today: 0,
+        queue_length: 0,
+        avg_wait_time: 0,
+        staff_online: 0,
+        new_patients_today: 0,
+        completed_appointments: 0
+      };
+    },
+    enabled: !!tenant && !!currentBranch,
+    refetchInterval: 30 * 1000, // Refresh every 30 seconds for real-time
+  });
+}
+
 // Hook for combined analytics dashboard data
 export function useAnalyticsDashboard() {
   const { tenant } = useAuth();
@@ -241,6 +283,7 @@ export function useAnalyticsDashboard() {
   const staffPerformance = useStaffPerformance();
   const appointmentTypes = useAppointmentTypeDistribution();
   const queuePerformance = useQueuePerformance();
+  const realtimeData = useRealtimeDashboard();
 
   // If user is not authenticated, provide sample data for demonstration
   if (!tenant) {
@@ -295,12 +338,26 @@ export function useAnalyticsDashboard() {
       queuePerformance: { 
         data: [{ 
           date: format(new Date(), 'yyyy-MM-dd'),
-          avg_wait_time: 1800,
+          avg_wait_time: 18,
           total_queue_entries: 22,
-          max_wait_time: 3600,
+          max_wait_time: 36,
           completed_entries: 18,
           no_show_entries: 2
         }],
+        isLoading: false,
+        isError: false
+      },
+      realtime: {
+        data: {
+          appointments_today: 5,
+          revenue_today: 255.00,
+          patients_today: 4,
+          queue_length: 2,
+          avg_wait_time: 18,
+          staff_online: 3,
+          new_patients_today: 1,
+          completed_appointments: 3
+        },
         isLoading: false,
         isError: false
       },
@@ -316,11 +373,14 @@ export function useAnalyticsDashboard() {
     staffPerformance,
     appointmentTypes,
     queuePerformance,
+    realtime: realtimeData,
     isLoading: appointmentData.isLoading || 
                revenueData.isLoading || 
-               patientFlowData.isLoading,
+               patientFlowData.isLoading ||
+               realtimeData.isLoading,
     isError: appointmentData.isError || 
              revenueData.isError || 
-             patientFlowData.isError,
+             patientFlowData.isError ||
+             realtimeData.isError,
   };
 }
