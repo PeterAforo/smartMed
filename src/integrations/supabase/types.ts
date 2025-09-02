@@ -4024,6 +4024,19 @@ export type Database = {
           total_queue_entries: number
         }[]
       }
+      get_realtime_dashboard_stats: {
+        Args: { target_branch_id?: string; target_tenant_id: string }
+        Returns: {
+          appointments_today: number
+          avg_wait_time: number
+          completed_appointments: number
+          new_patients_today: number
+          patients_today: number
+          queue_length: number
+          revenue_today: number
+          staff_online: number
+        }[]
+      }
       get_revenue_analytics: {
         Args: {
           end_date: string
