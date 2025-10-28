@@ -3,7 +3,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.56.0"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-signature',
+}
+
+// HMAC signature verification for cron jobs
+async function verifyHmacSignature(req: Request, body: string): Promise<boolean> {
+  const signature = req.headers.get('x-signature')
+  const webhookSecret = Deno.env.get('WEBHOOK_SECRET')
+  
+  if (!signature || !webhookSecret) {
+    return false
+  }
+
+  try {
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    )
+    
+    const signatureBytes = await crypto.subtle.sign(
+      'HMAC',
+      key,
+      encoder.encode(body)
+    )
+    
+    const expectedSignature = Array.from(new Uint8Array(signatureBytes))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+    
+    return signature === expectedSignature
+  } catch (error) {
+    console.error('HMAC verification error:', error)
+    return false
+  }
 }
 
 interface ReminderPayload {
@@ -167,6 +203,21 @@ serve(async (req: Request) => {
 
     // GET request - Process scheduled reminders (called by CRON)
     if (req.method === 'GET') {
+      // Verify HMAC signature for cron requests
+      const timestamp = new Date().toISOString()
+      const isValid = await verifyHmacSignature(req, timestamp)
+      
+      if (!isValid) {
+        console.error('Unauthorized: Invalid HMAC signature')
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized: Invalid signature' }),
+          { 
+            status: 401,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders }
+          }
+        )
+      }
+      
       console.log('Processing scheduled reminders...')
 
       // Get pending reminders that should be sent now
