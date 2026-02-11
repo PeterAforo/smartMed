@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { createAuthClient } from '@neondatabase/neon-js/auth';
 
 export const authClient = createAuthClient(
