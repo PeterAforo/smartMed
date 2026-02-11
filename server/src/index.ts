@@ -19,6 +19,7 @@ import triageRoutes from './routes/triage.js';
 import invoicesRoutes from './routes/invoices.js';
 import icd10Routes from './routes/icd10.js';
 import locationsRoutes from './routes/locations.js';
+import admissionsRoutes from './routes/admissions.js';
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use('/api/triage', triageRoutes);
 app.use('/api/invoices', invoicesRoutes);
 app.use('/api/icd10', icd10Routes);
 app.use('/api/locations', locationsRoutes);
+app.use('/api/admissions', admissionsRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

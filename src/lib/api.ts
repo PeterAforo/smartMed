@@ -738,6 +738,71 @@ class ApiClient {
     return this.request<any[]>(`/api/locations/districts${query ? `?${query}` : ''}`);
   }
 
+  // Admissions endpoints
+  async getAdmissions(params?: { status?: string; date?: string }) {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.date) searchParams.set('date', params.date);
+    const query = searchParams.toString();
+    return this.request<any[]>(`/api/admissions${query ? `?${query}` : ''}`);
+  }
+
+  async getAdmissionsStats() {
+    return this.request<any>('/api/admissions/stats');
+  }
+
+  async getCurrentInpatients(search?: string) {
+    const query = search ? `?search=${encodeURIComponent(search)}` : '';
+    return this.request<any[]>(`/api/admissions/current${query}`);
+  }
+
+  async getPendingAdmissions() {
+    return this.request<any[]>('/api/admissions/pending');
+  }
+
+  async getDischarges(date?: string) {
+    const query = date ? `?date=${date}` : '';
+    return this.request<any[]>(`/api/admissions/discharges${query}`);
+  }
+
+  async getAdmission(id: string) {
+    return this.request<any>(`/api/admissions/${id}`);
+  }
+
+  async createAdmission(data: any) {
+    return this.request<any>('/api/admissions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateAdmission(id: string, data: any) {
+    return this.request<any>(`/api/admissions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async assignBedToAdmission(admissionId: string, bedId: string) {
+    return this.request<any>(`/api/admissions/${admissionId}/assign-bed`, {
+      method: 'POST',
+      body: JSON.stringify({ bed_id: bedId }),
+    });
+  }
+
+  async dischargePatient(admissionId: string, data?: { discharge_notes?: string; follow_up_date?: string }) {
+    return this.request<any>(`/api/admissions/${admissionId}/discharge`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    });
+  }
+
+  async deleteAdmission(id: string) {
+    return this.request<{ success: boolean }>(`/api/admissions/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // File upload for patient photo
   async uploadPatientPhoto(patientId: string, file: File) {
     const formData = new FormData();
