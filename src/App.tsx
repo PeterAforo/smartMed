@@ -50,9 +50,6 @@ import API from "./pages/API";
 import QueueDisplay from "./pages/QueueDisplay";
 import Consultation from "./pages/Consultation";
 import NotFound from "./pages/NotFound";
-import { Home } from "./pages/home";
-import { Auth as NeonAuth } from "./pages/neon-auth";
-import { Account } from "./pages/account";
 
 const queryClient = new QueryClient();
 
@@ -442,10 +439,6 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* Neon Auth Routes */}
-            <Route path="/neon-home" element={<Home />} />
-            <Route path="/neon-auth/:pathname" element={<NeonAuth />} />
-            <Route path="/account/:pathname" element={<Account />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
