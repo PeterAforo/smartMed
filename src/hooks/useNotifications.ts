@@ -1,148 +1,67 @@
-import { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
-export interface NotificationPermission {
-  granted: boolean;
-  denied: boolean;
-  prompt: boolean;
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
 }
 
-export function useNotifications() {
-  const [permission, setPermission] = useState<NotificationPermission>({
-    granted: false,
-    denied: false,
-    prompt: false
+export const useNotifications = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const {
+    data: notifications = [],
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      // Get alerts as notifications
+      const alerts = await api.getAlerts({ status: 'active' });
+      const notifs = alerts.map((alert: any) => ({
+        id: alert.id,
+        type: alert.alert_type,
+        title: alert.title,
+        message: alert.message,
+        read: alert.status !== 'active',
+        created_at: alert.created_at
+      }));
+      setUnreadCount(notifs.filter((n: Notification) => !n.read).length);
+      return notifs;
+    },
+    enabled: !!user,
+    refetchInterval: 30000
   });
-  const { toast } = useToast();
 
-  useEffect(() => {
-    if ('Notification' in window) {
-      const currentPermission = Notification.permission;
-      setPermission({
-        granted: currentPermission === 'granted',
-        denied: currentPermission === 'denied',
-        prompt: currentPermission === 'default'
-      });
+  const markAsRead = useCallback(async (notificationId: string) => {
+    await api.acknowledgeAlert(notificationId);
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  }, [queryClient]);
+
+  const markAllAsRead = useCallback(async () => {
+    // Mark all as read
+    for (const notif of notifications.filter((n: Notification) => !n.read)) {
+      await api.acknowledgeAlert(notif.id);
     }
-  }, []);
-
-  const requestPermission = async () => {
-    if (!('Notification' in window)) {
-      toast({
-        title: "Notifications Not Supported",
-        description: "Your browser doesn't support notifications",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (Notification.permission === 'granted') {
-      return true;
-    }
-
-    const result = await Notification.requestPermission();
-    const newPermission = {
-      granted: result === 'granted',
-      denied: result === 'denied',
-      prompt: result === 'default'
-    };
-    
-    setPermission(newPermission);
-    
-    if (result === 'granted') {
-      toast({
-        title: "Notifications Enabled",
-        description: "You'll now receive real-time notifications",
-      });
-    }
-    
-    return result === 'granted';
-  };
-
-  const showNotification = (title: string, options?: NotificationOptions) => {
-    if (!permission.granted) {
-      return;
-    }
-
-    const notification = new Notification(title, {
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      requireInteraction: false,
-      silent: false,
-      ...options
-    });
-
-    // Auto-close after 5 seconds
-    setTimeout(() => {
-      notification.close();
-    }, 5000);
-
-    return notification;
-  };
-
-  const showAppointmentNotification = (type: 'new' | 'update' | 'reminder', patient: string, time?: string) => {
-    const titles = {
-      new: 'New Appointment Scheduled',
-      update: 'Appointment Updated',
-      reminder: 'Appointment Reminder'
-    };
-
-    const messages = {
-      new: `New appointment for ${patient}`,
-      update: `Appointment updated for ${patient}`,
-      reminder: `Upcoming appointment with ${patient}${time ? ` at ${time}` : ''}`
-    };
-
-    return showNotification(titles[type], {
-      body: messages[type],
-      tag: `appointment-${type}`,
-    });
-  };
-
-  const showQueueNotification = (type: 'checkin' | 'progress' | 'complete', patient: string, position?: number) => {
-    const titles = {
-      checkin: 'Patient Checked In',
-      progress: 'Appointment Started',
-      complete: 'Appointment Completed'
-    };
-
-    const messages = {
-      checkin: `${patient} checked in${position ? ` - Position #${position}` : ''}`,
-      progress: `${patient}'s appointment is now in progress`,
-      complete: `${patient}'s appointment has been completed`
-    };
-
-    return showNotification(titles[type], {
-      body: messages[type],
-      tag: `queue-${type}`,
-    });
-  };
-
-  const showResourceNotification = (type: 'booked' | 'inuse' | 'available', room: string, time?: string) => {
-    const titles = {
-      booked: 'Room Booked',
-      inuse: 'Room In Use',
-      available: 'Room Available'
-    };
-
-    const messages = {
-      booked: `${room} has been booked${time ? ` at ${time}` : ''}`,
-      inuse: `${room} is now in use`,
-      available: `${room} is now available`
-    };
-
-    return showNotification(titles[type], {
-      body: messages[type],
-      tag: `resource-${type}`,
-    });
-  };
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  }, [notifications, queryClient]);
 
   return {
-    permission,
-    requestPermission,
-    showNotification,
-    showAppointmentNotification,
-    showQueueNotification,
-    showResourceNotification
+    notifications,
+    unreadCount,
+    isLoading,
+    error,
+    refetch,
+    markAsRead,
+    markAllAsRead
   };
-}
+};

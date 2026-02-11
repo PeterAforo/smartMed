@@ -15,41 +15,7 @@ import { AppointmentTrendsChart, RevenueTrendsChart, PatientFlowChart, Appointme
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
 import { GenerateReportDialog } from "@/components/reports/GenerateReportDialog"
 
-// Mock data for reports
-const patientFlowData = [
-  { month: 'Jan', new: 45, returning: 132, total: 177 },
-  { month: 'Feb', new: 52, returning: 143, total: 195 },
-  { month: 'Mar', new: 48, returning: 156, total: 204 },
-  { month: 'Apr', new: 61, returning: 169, total: 230 },
-  { month: 'May', new: 55, returning: 174, total: 229 },
-  { month: 'Jun', new: 67, returning: 183, total: 250 },
-]
-
-const revenueData = [
-  { month: 'Jan', revenue: 45000, appointments: 177, avgPerPatient: 254 },
-  { month: 'Feb', revenue: 52000, appointments: 195, avgPerPatient: 267 },
-  { month: 'Mar', revenue: 48000, appointments: 204, avgPerPatient: 235 },
-  { month: 'Apr', revenue: 61000, appointments: 230, avgPerPatient: 265 },
-  { month: 'May', revenue: 58000, appointments: 229, avgPerPatient: 253 },
-  { month: 'Jun', revenue: 67000, appointments: 250, avgPerPatient: 268 },
-]
-
-const appointmentTypeData = [
-  { name: 'Consultation', value: 45, color: '#8884d8' },
-  { name: 'Follow-up', value: 30, color: '#82ca9d' },
-  { name: 'Emergency', value: 12, color: '#ffc658' },
-  { name: 'Surgery', value: 8, color: '#ff7300' },
-  { name: 'Therapy', value: 5, color: '#00ff88' },
-]
-
-const staffPerformanceData = [
-  { name: 'Dr. Smith', appointments: 145, satisfaction: 4.8, revenue: 35000 },
-  { name: 'Dr. Johnson', appointments: 132, satisfaction: 4.7, revenue: 32000 },
-  { name: 'Dr. Williams', appointments: 128, satisfaction: 4.9, revenue: 31000 },
-  { name: 'Dr. Brown', appointments: 115, satisfaction: 4.6, revenue: 28000 },
-  { name: 'Dr. Davis', appointments: 108, satisfaction: 4.8, revenue: 26000 },
-]
-
+// Report templates configuration
 const reportTemplates = [
   {
     id: 1,

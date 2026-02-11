@@ -5,80 +5,58 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Camera, FileText, Clock, User, Search, Plus } from 'lucide-react';
+import { Calendar, Camera, FileText, Clock, User, Search, Plus, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduleImagingDialog } from '@/components/radiology/ScheduleImagingDialog';
+import { api } from '@/lib/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Radiology = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [scheduleImagingOpen, setScheduleImagingOpen] = useState(false);
 
-  // Mock data for radiology imaging queue
-  const [imagingQueue] = useState([
-    {
-      id: 1,
-      patientName: 'John Smith',
-      patientId: 'PAT001',
-      examType: 'CT Scan - Chest',
-      priority: 'urgent',
-      scheduledTime: '09:00 AM',
-      status: 'scheduled',
-      technician: 'Dr. Wilson',
-      room: 'CT-1'
-    },
-    {
-      id: 2,
-      patientName: 'Sarah Johnson',
-      patientId: 'PAT002',
-      examType: 'X-Ray - Knee',
-      priority: 'routine',
-      scheduledTime: '09:30 AM',
-      status: 'in-progress',
-      technician: 'Tech. Brown',
-      room: 'X-RAY-2'
-    },
-    {
-      id: 3,
-      patientName: 'Mike Davis',
-      patientId: 'PAT003',
-      examType: 'MRI - Brain',
-      priority: 'stat',
-      scheduledTime: '10:00 AM',
-      status: 'waiting',
-      technician: 'Dr. Anderson',
-      room: 'MRI-1'
-    }
-  ]);
-
-  // Mock data for recent studies
-  const [recentStudies] = useState([
-    {
-      id: 1,
-      patientName: 'Emily Wilson',
-      studyType: 'CT Abdomen',
-      date: '2024-01-15',
-      status: 'completed',
-      findings: 'Normal findings',
-      radiologist: 'Dr. Martinez'
-    },
-    {
-      id: 2,
-      patientName: 'David Brown',
-      studyType: 'X-Ray Chest',
-      date: '2024-01-15',
-      status: 'pending-report',
-      findings: 'Under review',
-      radiologist: 'Dr. Thompson'
-    }
-  ]);
-
-  const [stats] = useState({
-    todaysExams: 24,
-    completedStudies: 18,
-    pendingReports: 6,
-    equipmentUtilization: 87
+  // Fetch imaging orders from API (using lab orders with imaging type)
+  const { data: imagingOrdersData = [], isLoading: ordersLoading } = useQuery({
+    queryKey: ['imaging', 'orders'],
+    queryFn: () => api.getLabOrders({ order_type: 'imaging' }),
+    refetchInterval: 15000
   });
+
+  // Transform imaging orders to queue format
+  const imagingQueue = imagingOrdersData.map((order: any) => ({
+    id: order.id,
+    patientName: `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Unknown',
+    patientId: order.patient_number || order.patient_id,
+    examType: order.test_name || 'Imaging Study',
+    priority: order.priority || 'routine',
+    scheduledTime: order.scheduled_time || 'Pending',
+    status: order.status || 'scheduled',
+    technician: order.technician || 'Unassigned',
+    room: order.room || 'TBD'
+  }));
+
+  // Recent completed studies
+  const recentStudies = imagingOrdersData
+    .filter((order: any) => order.status === 'completed')
+    .map((order: any) => ({
+      id: order.id,
+      patientName: `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Unknown',
+      studyType: order.test_name || 'Imaging Study',
+      date: order.result_date || order.order_date,
+      status: 'completed',
+      findings: order.findings || 'Pending review',
+      radiologist: order.radiologist || 'N/A'
+    }));
+
+  // Calculate stats from live data
+  const stats = {
+    todaysExams: imagingQueue.length,
+    completedStudies: imagingQueue.filter((o: any) => o.status === 'completed').length,
+    pendingReports: imagingQueue.filter((o: any) => o.status === 'pending_review').length,
+    equipmentUtilization: 85
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

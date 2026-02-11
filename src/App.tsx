@@ -47,6 +47,8 @@ import Feedback from "./pages/Feedback";
 import Audit from "./pages/Audit";
 import Backup from "./pages/Backup";
 import API from "./pages/API";
+import QueueDisplay from "./pages/QueueDisplay";
+import Consultation from "./pages/Consultation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,9 +82,13 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            } />
             <Route path="/auth" element={<Auth />} />
             <Route 
               path="/dashboard" 
@@ -411,6 +417,25 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <API />
+                </ProtectedRoute>
+              } 
+            />
+            {/* Queue Display - Public display for waiting rooms */}
+            <Route path="/queue-display" element={<QueueDisplay />} />
+            {/* Consultation Page */}
+            <Route 
+              path="/consultation/:patientId" 
+              element={
+                <ProtectedRoute>
+                  <Consultation />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/consultation/:patientId/:queueId" 
+              element={
+                <ProtectedRoute>
+                  <Consultation />
                 </ProtectedRoute>
               } 
             />

@@ -124,7 +124,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-72"} border-r bg-sidebar shadow-sm`}
+      className="border-r bg-sidebar shadow-sm"
       collapsible="icon"
     >
       {/* Header */}

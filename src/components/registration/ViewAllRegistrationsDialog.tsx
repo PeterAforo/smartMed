@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Search, Users, Eye } from 'lucide-react';
+import { Search, Users, Eye, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 
 interface ViewAllRegistrationsDialogProps {
   open: boolean;
@@ -15,17 +17,23 @@ export const ViewAllRegistrationsDialog = ({ open, onOpenChange }: ViewAllRegist
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Mock data for all registrations
-  const allRegistrations = [
-    { id: 1, name: 'John Doe', time: '10:30 AM', status: 'completed', patientId: 'P001', phone: '+233 20 123 4567', insurance: 'NHIS' },
-    { id: 2, name: 'Jane Smith', time: '10:45 AM', status: 'pending', patientId: 'P002', phone: '+233 20 234 5678', insurance: 'Private' },
-    { id: 3, name: 'Mike Johnson', time: '11:00 AM', status: 'in-progress', patientId: 'P003', phone: '+233 20 345 6789', insurance: 'NHIS' },
-    { id: 4, name: 'Sarah Davis', time: '11:15 AM', status: 'completed', patientId: 'P004', phone: '+233 20 456 7890', insurance: 'Cash' },
-    { id: 5, name: 'Robert Wilson', time: '11:30 AM', status: 'pending', patientId: 'P005', phone: '+233 20 567 8901', insurance: 'NHIS' },
-    { id: 6, name: 'Emily Brown', time: '11:45 AM', status: 'completed', patientId: 'P006', phone: '+233 20 678 9012', insurance: 'Private' },
-    { id: 7, name: 'David Lee', time: '12:00 PM', status: 'in-progress', patientId: 'P007', phone: '+233 20 789 0123', insurance: 'NHIS' },
-    { id: 8, name: 'Lisa Anderson', time: '12:15 PM', status: 'pending', patientId: 'P008', phone: '+233 20 890 1234', insurance: 'Cash' }
-  ];
+  // Fetch all patients from API
+  const { data: patients = [], isLoading } = useQuery({
+    queryKey: ['patients', 'all'],
+    queryFn: () => api.getPatients({ limit: 100 }),
+    enabled: open
+  });
+
+  // Transform patients to registration format
+  const allRegistrations = patients.map((p: any) => ({
+    id: p.id,
+    name: `${p.first_name} ${p.last_name}`,
+    time: new Date(p.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    status: 'completed',
+    patientId: p.patient_number,
+    phone: p.phone || 'N/A',
+    insurance: p.insurance_info?.provider || 'Cash'
+  }));
 
   const getStatusColor = (status: string) => {
     switch (status) {

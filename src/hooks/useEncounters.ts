@@ -1,10 +1,7 @@
-import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Encounter, NumberGenerator, DataValidator } from '@/lib/dataContracts';
-import { eventBus, HealthcareWorkflows } from '@/lib/eventBus';
 
 export interface CreateEncounterData {
   patient_id: string;
@@ -26,89 +23,35 @@ export interface UpdateEncounterData {
 }
 
 export const useEncounters = (patientId?: string) => {
-  const { user, tenant: currentTenant, currentBranch } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch encounters
   const {
     data: encounters = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['encounters', patientId, currentTenant?.id, currentBranch?.id],
+    queryKey: ['encounters', patientId],
     queryFn: async () => {
-      let query = supabase
-        .from('encounters')
-        .select(`
-          *,
-          patients!inner(id, first_name, last_name, medical_record_number),
-          profiles!encounters_attending_staff_fkey(id, first_name, last_name)
-        `)
-        .eq('tenant_id', currentTenant?.id)
-        .order('start_time', { ascending: false });
-
-      if (patientId) {
-        query = query.eq('patient_id', patientId);
-      }
-
-      if (currentBranch?.id) {
-        query = query.eq('branch_id', currentBranch.id);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data as any[];
+      // Encounters endpoint not implemented yet - return appointments as proxy
+      const appointments = await api.getAppointments({ patient_id: patientId });
+      return appointments;
     },
-    enabled: !!currentTenant?.id && !!user
+    enabled: !!user
   });
 
-  // Create encounter mutation
   const createEncounterMutation = useMutation({
     mutationFn: async (data: CreateEncounterData) => {
-      if (!currentTenant?.id || !currentBranch?.id || !user?.id) {
-        throw new Error('Missing required context');
-      }
-
-      const errors = DataValidator.validateEncounter({
-        ...data,
-        tenant_id: currentTenant.id,
-        branch_id: currentBranch.id
+      // Create as appointment for now
+      return api.createAppointment({
+        patient_id: data.patient_id,
+        appointment_date: new Date().toISOString().split('T')[0],
+        appointment_time: new Date().toTimeString().split(' ')[0],
+        appointment_type: 'consultation',
+        chief_complaint: data.chief_complaint,
+        notes: data.notes
       });
-
-      if (errors.length > 0) {
-        throw new Error(`Validation errors: ${errors.join(', ')}`);
-      }
-
-      const encounterNumber = NumberGenerator.generateEncounterNumber(currentBranch.code);
-
-      const encounter = {
-        ...data,
-        encounter_number: encounterNumber,
-        tenant_id: currentTenant.id,
-        branch_id: currentBranch.id,
-        attending_staff: data.attending_staff || user.id
-      };
-
-      const { data: newEncounter, error } = await supabase
-        .from('encounters')
-        .insert(encounter)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Emit event for encounter creation
-      await HealthcareWorkflows.startEncounter(
-        newEncounter.id,
-        data.patient_id,
-        currentTenant.id,
-        currentBranch.id,
-        user.id
-      );
-
-      return newEncounter;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['encounters'] });
@@ -119,35 +62,12 @@ export const useEncounters = (patientId?: string) => {
     }
   });
 
-  // Update encounter mutation
   const updateEncounterMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateEncounterData }) => {
-      if (!currentTenant?.id || !user?.id) {
-        throw new Error('Missing required context');
-      }
-
-      const { data: updatedEncounter, error } = await supabase
-        .from('encounters')
-        .update(data)
-        .eq('id', id)
-        .eq('tenant_id', currentTenant.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Emit event if encounter is being completed/discharged
-      if (data.status === 'completed') {
-        await HealthcareWorkflows.dischargePatient(
-          id,
-          updatedEncounter.patient_id,
-          currentTenant.id,
-          updatedEncounter.branch_id,
-          user.id
-        );
-      }
-
-      return updatedEncounter;
+      return api.updateAppointment(id, {
+        status: data.status === 'completed' ? 'completed' : data.status,
+        notes: data.notes
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['encounters'] });
@@ -157,31 +77,6 @@ export const useEncounters = (patientId?: string) => {
       toast.error(`Failed to update encounter: ${error.message}`);
     }
   });
-
-  // Real-time subscription for encounters
-  useEffect(() => {
-    if (!currentTenant?.id) return;
-
-    const channel = supabase
-      .channel('encounters-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'encounters',
-          filter: `tenant_id=eq.${currentTenant.id}`
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['encounters'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentTenant?.id, queryClient]);
 
   return {
     encounters,
@@ -196,25 +91,13 @@ export const useEncounters = (patientId?: string) => {
 };
 
 export const useEncounter = (encounterId: string) => {
-  const { tenant: currentTenant } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['encounter', encounterId, currentTenant?.id],
+    queryKey: ['encounter', encounterId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('encounters')
-        .select(`
-          *,
-          patients!inner(id, first_name, last_name, medical_record_number, date_of_birth, gender),
-          profiles!encounters_attending_staff_fkey(id, first_name, last_name, employee_id)
-        `)
-        .eq('id', encounterId)
-        .eq('tenant_id', currentTenant?.id)
-        .single();
-
-      if (error) throw error;
-      return data;
+      return api.getAppointment(encounterId);
     },
-    enabled: !!encounterId && !!currentTenant?.id
+    enabled: !!encounterId && !!user
   });
 };

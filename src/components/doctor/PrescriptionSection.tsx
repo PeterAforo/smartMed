@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Pill, Plus, Trash2, Save, AlertTriangle, Clock } from 'lucide-react';
+import { Pill, Plus, Trash2, Save, AlertTriangle, Clock, Search, Package } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { api } from '@/lib/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PrescriptionSectionProps {
   patientId: string;
@@ -17,12 +19,15 @@ interface PrescriptionSectionProps {
 
 interface Medication {
   id: string;
+  inventoryId: string;
   name: string;
   dosage: string;
   frequency: string;
   duration: string;
   instructions: string;
   route: string;
+  quantity: number;
+  stockAvailable: number;
 }
 
 interface DrugInteraction {
@@ -37,13 +42,41 @@ export const PrescriptionSection = ({
   encounterId 
 }: PrescriptionSectionProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [prescriptionNotes, setPrescriptionNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock patient allergies and current medications
-  const patientAllergies = ['Penicillin', 'Sulfa drugs'];
-  const currentMedications = ['Metformin 500mg BID', 'Lisinopril 10mg OD'];
+  // Fetch inventory/medications from pharmacy
+  const { data: inventoryData = [], isLoading: inventoryLoading } = useQuery({
+    queryKey: ['pharmacy', 'medications'],
+    queryFn: () => api.getMedications({}),
+  });
+
+  // Fetch patient's existing prescriptions
+  const { data: existingPrescriptions = [] } = useQuery({
+    queryKey: ['prescriptions', 'patient', patientId],
+    queryFn: () => api.getPrescriptions({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Fetch patient's triage data for allergies
+  const { data: triageData = [] } = useQuery({
+    queryKey: ['triage', 'patient', patientId],
+    queryFn: () => api.getTriageAssessments({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Get allergies from latest triage
+  const latestTriage = triageData[0];
+  const patientAllergies: string[] = latestTriage?.allergies || [];
+  
+  // Get current medications from existing prescriptions
+  const currentMedications = existingPrescriptions
+    .filter((p: any) => p.status === 'active' || p.status === 'dispensed')
+    .map((p: any) => `${p.medication_name} ${p.dosage} ${p.frequency}`);
+
   const drugInteractions: DrugInteraction[] = [
     {
       drug1: 'Warfarin',
@@ -53,15 +86,54 @@ export const PrescriptionSection = ({
     }
   ];
 
+  // Filter inventory based on search
+  const filteredInventory = inventoryData.filter((item: any) =>
+    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.generic_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const addMedicationFromInventory = (inventoryItem: any) => {
+    const newMedication: Medication = {
+      id: Date.now().toString(),
+      inventoryId: inventoryItem.id,
+      name: inventoryItem.name || inventoryItem.generic_name,
+      dosage: inventoryItem.strength || '',
+      frequency: '',
+      duration: '',
+      instructions: '',
+      route: 'PO',
+      quantity: 1,
+      stockAvailable: inventoryItem.quantity_in_stock || 0
+    };
+    setMedications([...medications, newMedication]);
+    setSearchTerm('');
+    
+    if (inventoryItem.quantity_in_stock <= 0) {
+      toast({
+        title: "Low Stock Warning",
+        description: `${inventoryItem.name} is out of stock.`,
+        variant: "destructive"
+      });
+    } else if (inventoryItem.quantity_in_stock < 10) {
+      toast({
+        title: "Low Stock Warning", 
+        description: `Only ${inventoryItem.quantity_in_stock} units of ${inventoryItem.name} available.`,
+      });
+    }
+  };
+
   const addMedication = () => {
     const newMedication: Medication = {
       id: Date.now().toString(),
+      inventoryId: '',
       name: '',
       dosage: '',
       frequency: '',
       duration: '',
       instructions: '',
-      route: 'PO'
+      route: 'PO',
+      quantity: 1,
+      stockAvailable: 0
     };
     setMedications([...medications, newMedication]);
   };
@@ -366,22 +438,66 @@ export const PrescriptionSection = ({
           </Card>
         </div>
 
-        {/* Current Medications Sidebar */}
-        <div className="w-80 border-l bg-muted/20 p-4">
+        {/* Inventory Search Sidebar */}
+        <div className="w-80 border-l bg-muted/20 p-4 flex flex-col">
           <h4 className="font-medium mb-4 flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Current Medications
+            <Package className="h-4 w-4" />
+            Add from Inventory
           </h4>
-          <ScrollArea className="h-64">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search medications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <ScrollArea className="flex-1">
             <div className="space-y-2">
-              {currentMedications.map((med, index) => (
-                <div key={index} className="p-3 bg-background rounded-lg border">
-                  <p className="text-sm font-medium">{med}</p>
-                  <p className="text-xs text-muted-foreground">Ongoing</p>
-                </div>
-              ))}
+              {inventoryLoading ? (
+                <p className="text-sm text-muted-foreground text-center py-4">Loading inventory...</p>
+              ) : searchTerm && filteredInventory.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No medications found</p>
+              ) : (
+                (searchTerm ? filteredInventory : inventoryData.slice(0, 10)).map((item: any) => (
+                  <div 
+                    key={item.id} 
+                    className="p-3 bg-background rounded-lg border cursor-pointer hover:bg-accent transition-colors"
+                    onClick={() => addMedicationFromInventory(item)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{item.name}</p>
+                      <Badge variant={item.quantity_in_stock > 10 ? 'default' : item.quantity_in_stock > 0 ? 'secondary' : 'destructive'} className="text-xs">
+                        {item.quantity_in_stock || 0} in stock
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{item.strength} • {item.dosage_form}</p>
+                  </div>
+                ))
+              )}
             </div>
           </ScrollArea>
+          
+          <div className="mt-4 pt-4 border-t">
+            <h4 className="font-medium mb-2 flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Current Medications
+            </h4>
+            <ScrollArea className="h-32">
+              <div className="space-y-2">
+                {currentMedications.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No current medications</p>
+                ) : (
+                  currentMedications.map((med: string, index: number) => (
+                    <div key={index} className="p-2 bg-background rounded border text-xs">
+                      {med}
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
       </div>
     </div>

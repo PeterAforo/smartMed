@@ -5,120 +5,60 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, Search, AlertTriangle, TrendingDown, TrendingUp, Clock } from 'lucide-react';
+import { Package, Search, AlertTriangle, TrendingDown, TrendingUp, Clock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StockAdjustmentDialog } from '@/components/inventory/StockAdjustmentDialog';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 const Inventory = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [stockAdjustmentOpen, setStockAdjustmentOpen] = useState(false);
   const [selectedItemCode, setSelectedItemCode] = useState('');
-  
-  const [inventoryItems] = useState([
-    {
-      id: 1,
-      itemName: 'Surgical Gloves (Box)',
-      itemCode: 'SG-001',
-      category: 'Medical Supplies',
-      currentStock: 45,
-      minStock: 100,
-      maxStock: 500,
-      unitPrice: 25.99,
-      supplier: 'MedSupply Co.',
-      lastRestocked: '2024-01-10',
-      expiryDate: '2025-12-31',
-      location: 'Store A-1'
-    },
-    {
-      id: 2,
-      itemName: 'Disposable Syringes 10ml',
-      itemCode: 'DS-010',
-      category: 'Medical Supplies',
-      currentStock: 250,
-      minStock: 200,
-      maxStock: 1000,
-      unitPrice: 0.85,
-      supplier: 'HealthPlus Supplies',
-      lastRestocked: '2024-01-12',
-      expiryDate: '2026-06-30',
-      location: 'Store A-2'
-    },
-    {
-      id: 3,
-      itemName: 'Blood Pressure Monitor',
-      itemCode: 'BPM-001',
-      category: 'Medical Equipment',
-      currentStock: 5,
-      minStock: 10,
-      maxStock: 25,
-      unitPrice: 189.99,
-      supplier: 'MedTech Solutions',
-      lastRestocked: '2024-01-05',
-      expiryDate: null,
-      location: 'Equipment Room B'
-    },
-    {
-      id: 4,
-      itemName: 'Paracetamol 500mg (Strip)',
-      itemCode: 'PAR-500',
-      category: 'Pharmaceuticals',
-      currentStock: 120,
-      minStock: 50,
-      maxStock: 300,
-      unitPrice: 2.50,
-      supplier: 'PharmaCorp',
-      lastRestocked: '2024-01-08',
-      expiryDate: '2025-03-15',
-      location: 'Pharmacy Store'
-    }
-  ]);
 
-  const [lowStockItems] = useState([
-    { name: 'Surgical Gloves', currentStock: 45, minStock: 100, shortage: 55 },
-    { name: 'Blood Pressure Monitor', currentStock: 5, minStock: 10, shortage: 5 },
-    { name: 'Thermometer Digital', currentStock: 8, minStock: 15, shortage: 7 },
-    { name: 'Oxygen Masks', currentStock: 12, minStock: 25, shortage: 13 }
-  ]);
-
-  const [recentMovements] = useState([
-    {
-      id: 1,
-      item: 'Disposable Syringes 10ml',
-      type: 'outbound',
-      quantity: 50,
-      department: 'Emergency Room',
-      timestamp: '2024-01-15 14:30',
-      reference: 'REQ-2024-001'
-    },
-    {
-      id: 2,
-      item: 'Surgical Gloves',
-      type: 'inbound',
-      quantity: 200,
-      department: 'Supplier Delivery',
-      timestamp: '2024-01-15 10:15',
-      reference: 'PO-2024-005'
-    },
-    {
-      id: 3,
-      item: 'Paracetamol 500mg',
-      type: 'outbound',
-      quantity: 30,
-      department: 'Pharmacy',
-      timestamp: '2024-01-15 09:45',
-      reference: 'REQ-2024-002'
-    }
-  ]);
-
-  const [stats] = useState({
-    totalItems: 1250,
-    lowStockAlerts: 15,
-    totalValue: 125000.00,
-    expiringItems: 8,
-    pendingOrders: 12,
-    monthlyConsumption: 45000.00
+  // Fetch inventory items from API
+  const { data: inventoryData = [], isLoading: inventoryLoading } = useQuery({
+    queryKey: ['inventory'],
+    queryFn: () => api.getInventory({}),
+    refetchInterval: 30000
   });
+
+  // Transform inventory data
+  const inventoryItems = inventoryData.map((item: any) => ({
+    id: item.id,
+    itemName: item.name || item.item_name,
+    itemCode: item.sku || item.item_code || `ITM-${item.id}`,
+    category: item.category || 'General',
+    currentStock: item.quantity_in_stock || item.current_stock || 0,
+    minStock: item.reorder_level || item.min_stock || 10,
+    maxStock: item.max_stock || 1000,
+    unitPrice: item.unit_price || 0,
+    supplier: item.supplier || 'N/A',
+    lastRestocked: item.last_restocked || item.updated_at,
+    expiryDate: item.expiry_date,
+    location: item.location || 'Main Store'
+  }));
+
+  // Calculate low stock items
+  const lowStockItems = inventoryItems
+    .filter((item: any) => item.currentStock <= item.minStock)
+    .map((item: any) => ({
+      name: item.itemName,
+      currentStock: item.currentStock,
+      minStock: item.minStock,
+      shortage: item.minStock - item.currentStock
+    }));
+
+  // Calculate stats from live data
+  const stats = {
+    totalItems: inventoryItems.length,
+    lowStockAlerts: lowStockItems.length,
+    totalValue: inventoryItems.reduce((sum: number, item: any) => sum + (item.currentStock * item.unitPrice), 0),
+    expiringItems: inventoryItems.filter((item: any) => isExpiringSoon(item.expiryDate)).length,
+    pendingOrders: 0,
+    monthlyConsumption: 0
+  };
 
   const getStockStatus = (currentStock: number, minStock: number, maxStock: number) => {
     const percentage = (currentStock / maxStock) * 100;
@@ -406,28 +346,10 @@ const Inventory = () => {
                     <CardDescription>Track all inventory transactions and transfers</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {recentMovements.map((movement) => (
-                        <div key={movement.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-4 mb-2">
-                              <h3 className="font-semibold">{movement.item}</h3>
-                              <Badge className={getMovementTypeColor(movement.type)}>
-                                {movement.type}
-                              </Badge>
-                              <span className="font-medium">
-                                {movement.type === 'outbound' ? '-' : '+'}{movement.quantity} units
-                              </span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              Department: {movement.department} • Time: {movement.timestamp}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Reference: {movement.reference}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No recent stock movements recorded</p>
+                      <p className="text-sm">Stock movements will appear here when inventory is adjusted</p>
                     </div>
                   </CardContent>
                 </Card>

@@ -7,13 +7,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TestTube, Camera, Stethoscope, Plus, Save, Clock } from 'lucide-react';
+import { TestTube, Camera, Stethoscope, Plus, Save, Clock, Trash2, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useOrders } from '@/hooks/useOrders';
+import { api } from '@/lib/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface OrdersSectionProps {
   patientId: string;
   encounterId: string | null;
+}
+
+interface OrderItem {
+  id: string;
+  orderType: 'lab' | 'imaging' | 'procedure';
+  orderCode: string;
+  orderName: string;
+  category: string;
+  instructions: string;
+  priority: 'routine' | 'urgent' | 'stat';
+  scheduledFor?: string;
 }
 
 interface OrderData {
@@ -29,13 +42,23 @@ export const OrdersSection = ({
   encounterId 
 }: OrdersSectionProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { createOrder, isCreating } = useOrders();
   const [activeOrderType, setActiveOrderType] = useState<'lab' | 'imaging' | 'procedure'>('lab');
+  const [pendingOrders, setPendingOrders] = useState<OrderItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderData, setOrderData] = useState<OrderData>({
     orderType: 'lab',
     orderCode: '',
     instructions: '',
     priority: 'routine'
+  });
+
+  // Fetch existing orders for this patient
+  const { data: existingLabOrders = [] } = useQuery({
+    queryKey: ['lab', 'orders', patientId],
+    queryFn: () => api.getLabOrders({ patient_id: patientId }),
+    enabled: !!patientId
   });
 
   // Mock order templates

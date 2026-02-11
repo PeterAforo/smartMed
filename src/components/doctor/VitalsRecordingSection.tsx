@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Save, TrendingUp, TrendingDown } from 'lucide-react';
+import { Activity, Save, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface VitalsRecordingSectionProps {
   patientId: string;
@@ -30,6 +32,18 @@ export const VitalsRecordingSection = ({
   encounterId 
 }: VitalsRecordingSectionProps) => {
   const { toast } = useToast();
+  
+  // Fetch triage data for this patient
+  const { data: triageData = [], isLoading: triageLoading } = useQuery({
+    queryKey: ['triage', 'patient', patientId],
+    queryFn: () => api.getTriageAssessments({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Get the most recent triage assessment
+  const latestTriage = triageData[0];
+  const previousTriage = triageData[1];
+
   const [vitals, setVitals] = useState<VitalSigns>({
     systolic: '',
     diastolic: '',
@@ -43,19 +57,37 @@ export const VitalsRecordingSection = ({
     painScale: ''
   });
 
+  // Populate vitals from triage data when it loads
+  useEffect(() => {
+    if (latestTriage) {
+      setVitals({
+        systolic: latestTriage.blood_pressure_systolic?.toString() || '',
+        diastolic: latestTriage.blood_pressure_diastolic?.toString() || '',
+        pulse: latestTriage.pulse_rate?.toString() || '',
+        temperature: latestTriage.temperature?.toString() || '',
+        respiratoryRate: latestTriage.respiratory_rate?.toString() || '',
+        oxygenSaturation: latestTriage.oxygen_saturation?.toString() || '',
+        weight: latestTriage.weight?.toString() || '',
+        height: latestTriage.height?.toString() || '',
+        bmi: '',
+        painScale: latestTriage.pain_level?.toString() || ''
+      });
+    }
+  }, [latestTriage]);
+
   const [isSaving, setIsSaving] = useState(false);
 
-  // Mock previous vitals for comparison
+  // Previous vitals from second most recent triage or defaults
   const previousVitals = {
-    systolic: '120',
-    diastolic: '80',
-    pulse: '72',
-    temperature: '98.6',
-    respiratoryRate: '16',
-    oxygenSaturation: '98',
-    weight: '70',
-    height: '175',
-    bmi: '22.9'
+    systolic: previousTriage?.blood_pressure_systolic?.toString() || '--',
+    diastolic: previousTriage?.blood_pressure_diastolic?.toString() || '--',
+    pulse: previousTriage?.pulse_rate?.toString() || '--',
+    temperature: previousTriage?.temperature?.toString() || '--',
+    respiratoryRate: previousTriage?.respiratory_rate?.toString() || '--',
+    oxygenSaturation: previousTriage?.oxygen_saturation?.toString() || '--',
+    weight: previousTriage?.weight?.toString() || '--',
+    height: previousTriage?.height?.toString() || '--',
+    bmi: '--'
   };
 
   const calculateBMI = () => {

@@ -5,94 +5,75 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, User, Heart, Calendar, Search, Plus, Activity, AlertCircle } from 'lucide-react';
+import { FileText, User, Heart, Calendar, Search, Plus, Activity, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { NewMedicalRecordDialog } from '@/components/emr/NewMedicalRecordDialog';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { differenceInYears } from 'date-fns';
 
 const EMR = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [newRecordOpen, setNewRecordOpen] = useState(false);
+  const today = new Date().toISOString().split('T')[0];
 
-  // Mock data for patient records
-  const [patientRecords] = useState([
-    {
-      id: 1,
-      patientId: 'PAT001',
-      name: 'John Smith',
-      age: 45,
-      gender: 'Male',
-      lastVisit: '2024-01-15',
-      diagnosis: 'Hypertension',
-      status: 'active',
-      allergies: ['Penicillin', 'Shellfish'],
-      medications: ['Lisinopril 10mg', 'Metformin 500mg'],
-      vitals: { bp: '140/90', hr: 72, temp: 98.6, weight: 180 }
-    },
-    {
-      id: 2,
-      patientId: 'PAT002',
-      name: 'Sarah Johnson',
-      age: 32,
-      gender: 'Female',
-      lastVisit: '2024-01-14',
-      diagnosis: 'Diabetes Type 2',
-      status: 'active',
-      allergies: ['Latex'],
-      medications: ['Metformin 1000mg', 'Glipizide 5mg'],
-      vitals: { bp: '125/80', hr: 78, temp: 98.4, weight: 145 }
-    },
-    {
-      id: 3,
-      patientId: 'PAT003',
-      name: 'Michael Brown',
-      age: 58,
-      gender: 'Male',
-      lastVisit: '2024-01-13',
-      diagnosis: 'Coronary Artery Disease',
-      status: 'critical',
-      allergies: ['Aspirin'],
-      medications: ['Atorvastatin 40mg', 'Clopidogrel 75mg'],
-      vitals: { bp: '160/95', hr: 88, temp: 99.1, weight: 195 }
-    }
-  ]);
-
-  // Mock data for recent activities
-  const [recentActivities] = useState([
-    {
-      id: 1,
-      type: 'lab_result',
-      patient: 'John Smith',
-      description: 'Blood panel results received',
-      time: '2 hours ago',
-      priority: 'normal'
-    },
-    {
-      id: 2,
-      type: 'prescription',
-      patient: 'Sarah Johnson',
-      description: 'New prescription added: Insulin',
-      time: '4 hours ago',
-      priority: 'high'
-    },
-    {
-      id: 3,
-      type: 'appointment',
-      patient: 'Michael Brown',
-      description: 'Follow-up appointment scheduled',
-      time: '6 hours ago',
-      priority: 'normal'
-    }
-  ]);
-
-  const [emrStats] = useState({
-    totalRecords: 2847,
-    activePatients: 1523,
-    criticalAlerts: 8,
-    pendingResults: 24,
-    todaysVisits: 67,
-    systemUptime: 99.8
+  // Fetch medical records from API
+  const { data: medicalRecordsData = [], isLoading: recordsLoading } = useQuery({
+    queryKey: ['emr', 'records'],
+    queryFn: () => api.getMedicalRecords({}),
+    refetchInterval: 30000
   });
+
+  // Fetch patients for additional data
+  const { data: patientsData = [] } = useQuery({
+    queryKey: ['patients'],
+    queryFn: () => api.getPatients({}),
+    refetchInterval: 60000
+  });
+
+  // Fetch today's appointments for visits count
+  const { data: todayAppointments = [] } = useQuery({
+    queryKey: ['appointments', 'today'],
+    queryFn: () => api.getAppointments({ date: today }),
+    refetchInterval: 30000
+  });
+
+  // Fetch lab orders for pending results
+  const { data: labOrders = [] } = useQuery({
+    queryKey: ['lab', 'orders'],
+    queryFn: () => api.getLabOrders({}),
+    refetchInterval: 30000
+  });
+
+  // Transform patient records with vitals
+  const patientRecords = patientsData.map((patient: any) => {
+    const records = medicalRecordsData.filter((r: any) => r.patient_id === patient.id);
+    const latestRecord = records[0];
+    return {
+      id: patient.id,
+      patientId: patient.patient_number,
+      name: `${patient.first_name} ${patient.last_name}`,
+      age: patient.date_of_birth ? differenceInYears(new Date(), new Date(patient.date_of_birth)) : 'N/A',
+      gender: patient.gender || 'N/A',
+      lastVisit: latestRecord?.visit_date || patient.updated_at,
+      diagnosis: latestRecord?.diagnosis || 'No diagnosis',
+      status: patient.status || 'active',
+      allergies: patient.allergies || [],
+      medications: patient.current_medications || [],
+      vitals: { bp: 'N/A', hr: 'N/A', temp: 'N/A', weight: 'N/A' }
+    };
+  });
+
+  // Calculate stats from live data
+  const emrStats = {
+    totalRecords: medicalRecordsData.length,
+    activePatients: patientsData.filter((p: any) => p.status === 'active').length,
+    criticalAlerts: patientRecords.filter((p: any) => p.status === 'critical').length,
+    pendingResults: labOrders.filter((o: any) => o.status === 'pending' || o.status === 'processing').length,
+    todaysVisits: todayAppointments.length,
+    systemUptime: 99.8
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -301,29 +282,10 @@ const EMR = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-medium">{activity.patient}</h3>
-                          <Badge className={getPriorityColor(activity.priority)}>
-                            {activity.priority.toUpperCase()}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{activity.description}</p>
-                        <p className="text-xs text-muted-foreground">{activity.time}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          Follow Up
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No recent activities</p>
+                  <p className="text-sm">Activities will appear here as records are updated</p>
                 </div>
               </CardContent>
             </Card>

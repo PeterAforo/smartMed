@@ -1,111 +1,105 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
 
 export interface Patient {
   id: string;
-  tenant_id: string;
-  branch_id: string;
+  patient_number: string;
   first_name: string;
   last_name: string;
-  medical_record_number: string;
   date_of_birth: string;
-  gender: 'M' | 'F' | 'O';
+  gender: 'male' | 'female' | 'other';
   phone?: string;
   email?: string;
   address?: string;
-  emergency_contact?: any;
-  insurance_info?: any;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  allergies?: string[];
+  status: 'active' | 'inactive' | 'deceased';
   created_at: string;
   updated_at: string;
 }
 
 export const usePatients = (searchTerm?: string) => {
-  const { user, tenant: currentTenant, currentBranch } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch patients
   const {
     data: patients = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['patients', searchTerm, currentTenant?.id, currentBranch?.id],
+    queryKey: ['patients', searchTerm],
     queryFn: async () => {
-      let query = supabase
-        .from('patients')
-        .select('*')
-        .eq('tenant_id', currentTenant?.id)
-        .order('created_at', { ascending: false });
-
-      if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,medical_record_number.ilike.%${searchTerm}%`);
-      }
-
-      if (currentBranch?.id) {
-        query = query.eq('branch_id', currentBranch.id);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data as any[];
+      return api.getPatients({ search: searchTerm });
     },
-    enabled: !!currentTenant?.id && !!user
+    enabled: !!user,
+    refetchInterval: 30000
   });
 
-  // Real-time subscription for patients
-  useEffect(() => {
-    if (!currentTenant?.id) return;
+  const createPatientMutation = useMutation({
+    mutationFn: async (data: Partial<Patient>) => {
+      return api.createPatient(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      toast.success('Patient created successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create patient: ${error.message}`);
+    }
+  });
 
-    const channel = supabase
-      .channel('patients-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'patients',
-          filter: `tenant_id=eq.${currentTenant.id}`
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['patients'] });
-        }
-      )
-      .subscribe();
+  const updatePatientMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Patient> }) => {
+      return api.updatePatient(id, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      toast.success('Patient updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update patient: ${error.message}`);
+    }
+  });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentTenant?.id, queryClient]);
+  const deletePatientMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return api.deletePatient(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      toast.success('Patient deleted successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to delete patient: ${error.message}`);
+    }
+  });
 
   return {
     patients,
     isLoading,
     error,
-    refetch
+    refetch,
+    createPatient: createPatientMutation.mutate,
+    updatePatient: updatePatientMutation.mutate,
+    deletePatient: deletePatientMutation.mutate,
+    isCreating: createPatientMutation.isPending,
+    isUpdating: updatePatientMutation.isPending,
+    isDeleting: deletePatientMutation.isPending
   };
 };
 
 export const usePatient = (patientId: string) => {
-  const { tenant: currentTenant } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['patient', patientId, currentTenant?.id],
+    queryKey: ['patient', patientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('patients')
-        .select('*')
-        .eq('id', patientId)
-        .eq('tenant_id', currentTenant?.id)
-        .single();
-
-      if (error) throw error;
-      return data as any;
+      return api.getPatient(patientId);
     },
-    enabled: !!patientId && !!currentTenant?.id
+    enabled: !!patientId && !!user
   });
 };

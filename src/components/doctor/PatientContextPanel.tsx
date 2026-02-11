@@ -9,49 +9,124 @@ import {
   Pill, 
   Activity, 
   Calendar, 
-  FileText 
+  FileText,
+  Loader2
 } from 'lucide-react';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface PatientContextPanelProps {
   patientId: string;
 }
 
 export const PatientContextPanel = ({ patientId }: PatientContextPanelProps) => {
-  // Mock patient data - in real implementation, this would come from hooks
+  // Fetch patient data
+  const { data: patient, isLoading: patientLoading } = useQuery({
+    queryKey: ['patient', patientId],
+    queryFn: () => api.getPatient(patientId),
+    enabled: !!patientId
+  });
+
+  // Fetch triage/vitals data
+  const { data: triageData = [] } = useQuery({
+    queryKey: ['triage', 'patient', patientId],
+    queryFn: () => api.getTriageAssessments({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Fetch prescriptions
+  const { data: prescriptions = [] } = useQuery({
+    queryKey: ['prescriptions', 'patient', patientId],
+    queryFn: () => api.getPrescriptions({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Fetch medical records
+  const { data: medicalRecords = [] } = useQuery({
+    queryKey: ['emr', 'patient', patientId],
+    queryFn: () => api.getMedicalRecords({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  // Fetch lab orders
+  const { data: labOrders = [] } = useQuery({
+    queryKey: ['lab', 'patient', patientId],
+    queryFn: () => api.getLabOrders({ patient_id: patientId }),
+    enabled: !!patientId
+  });
+
+  if (patientLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  // Calculate age from date of birth
+  const calculateAge = (dob: string | null) => {
+    if (!dob) return 'N/A';
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Get most recent triage/vitals
+  const recentTriage = triageData[0];
+
+  // Transform data for display
   const patientData = {
     id: patientId,
-    name: 'John Doe',
-    age: 45,
-    gender: 'Male',
-    mrn: 'MRN-12345',
-    phone: '+233 20 123 4567',
-    allergies: ['Penicillin', 'Shellfish'],
-    currentMedications: [
-      { name: 'Metformin', dosage: '500mg', frequency: 'BID' },
-      { name: 'Lisinopril', dosage: '10mg', frequency: 'OD' },
-      { name: 'Aspirin', dosage: '81mg', frequency: 'OD' }
-    ],
-    medicalHistory: [
-      { condition: 'Type 2 Diabetes Mellitus', date: '2020-03-15', status: 'Active' },
-      { condition: 'Hypertension', date: '2019-08-22', status: 'Active' },
-      { condition: 'Hyperlipidemia', date: '2021-01-10', status: 'Active' }
-    ],
-    recentVitals: {
-      bloodPressure: '140/85',
-      pulse: '78',
-      temperature: '98.6°F',
-      weight: '85kg',
-      date: '2024-01-15'
-    },
-    recentVisits: [
-      { date: '2024-01-10', provider: 'Dr. Smith', diagnosis: 'DM Follow-up', status: 'Completed' },
-      { date: '2023-12-15', provider: 'Dr. Johnson', diagnosis: 'Annual Physical', status: 'Completed' },
-      { date: '2023-11-20', provider: 'Dr. Smith', diagnosis: 'HTN Management', status: 'Completed' }
-    ],
-    pendingOrders: [
-      { type: 'Lab', order: 'HbA1c', status: 'Pending', date: '2024-01-12' },
-      { type: 'Imaging', order: 'Chest X-Ray', status: 'Scheduled', date: '2024-01-16' }
-    ]
+    name: patient ? `${patient.first_name || ''} ${patient.last_name || ''}`.trim() : 'Unknown',
+    age: patient ? calculateAge(patient.date_of_birth) : 'N/A',
+    gender: patient?.gender || 'N/A',
+    mrn: patient?.patient_number || 'N/A',
+    phone: patient?.phone || 'N/A',
+    allergies: recentTriage?.allergies || [],
+    currentMedications: prescriptions
+      .filter((p: any) => p.status === 'active' || p.status === 'dispensed')
+      .slice(0, 5)
+      .map((p: any) => ({
+        name: p.medication_name || 'Unknown',
+        dosage: p.dosage || '',
+        frequency: p.frequency || ''
+      })),
+    recentVitals: recentTriage ? {
+      bloodPressure: recentTriage.blood_pressure_systolic && recentTriage.blood_pressure_diastolic 
+        ? `${recentTriage.blood_pressure_systolic}/${recentTriage.blood_pressure_diastolic}` : 'N/A',
+      pulse: recentTriage.pulse_rate || 'N/A',
+      temperature: recentTriage.temperature ? `${recentTriage.temperature}°F` : 'N/A',
+      weight: recentTriage.weight ? `${recentTriage.weight}kg` : 'N/A',
+      date: recentTriage.assessed_at ? new Date(recentTriage.assessed_at).toLocaleDateString() : 'N/A'
+    } : null,
+    recentVisits: medicalRecords.slice(0, 3).map((rec: any) => ({
+      date: rec.visit_date ? new Date(rec.visit_date).toLocaleDateString() : 'N/A',
+      provider: rec.provider_name || 'N/A',
+      diagnosis: rec.diagnosis || 'N/A',
+      status: rec.status || 'Completed'
+    })),
+    medicalHistory: medicalRecords
+      .filter((rec: any) => rec.diagnosis)
+      .slice(0, 5)
+      .map((rec: any) => ({
+        condition: rec.diagnosis,
+        date: rec.visit_date ? new Date(rec.visit_date).toLocaleDateString() : 'N/A',
+        status: 'Active'
+      })),
+    pendingOrders: labOrders
+      .filter((o: any) => o.status === 'pending' || o.status === 'in_progress')
+      .slice(0, 5)
+      .map((o: any) => ({
+        type: 'Lab',
+        order: o.test_name || 'Lab Test',
+        status: o.status || 'Pending',
+        date: o.order_date ? new Date(o.order_date).toLocaleDateString() : 'N/A'
+      }))
   };
 
   return (
@@ -129,15 +204,19 @@ export const PatientContextPanel = ({ patientId }: PatientContextPanelProps) => 
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="text-sm">
-              <p>BP: {patientData.recentVitals.bloodPressure}</p>
-              <p>Pulse: {patientData.recentVitals.pulse} bpm</p>
-              <p>Temp: {patientData.recentVitals.temperature}</p>
-              <p>Weight: {patientData.recentVitals.weight}</p>
-              <p className="text-muted-foreground text-xs mt-1">
-                {patientData.recentVitals.date}
-              </p>
-            </div>
+            {patientData.recentVitals ? (
+              <div className="text-sm">
+                <p>BP: {patientData.recentVitals.bloodPressure}</p>
+                <p>Pulse: {patientData.recentVitals.pulse} bpm</p>
+                <p>Temp: {patientData.recentVitals.temperature}</p>
+                <p>Weight: {patientData.recentVitals.weight}</p>
+                <p className="text-muted-foreground text-xs mt-1">
+                  {patientData.recentVitals.date}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No vitals recorded yet</p>
+            )}
           </CardContent>
         </Card>
 

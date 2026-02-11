@@ -6,12 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Thermometer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { api } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface RecordVitalsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   patient?: {
-    id: number;
+    id: string;
+    patient_id: string;
     name: string;
     patientId: string;
     room: string;
@@ -20,6 +23,7 @@ interface RecordVitalsDialogProps {
 
 export const RecordVitalsDialog = ({ open, onOpenChange, patient }: RecordVitalsDialogProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [vitals, setVitals] = useState({
     temperature: '',
@@ -50,32 +54,70 @@ export const RecordVitalsDialog = ({ open, onOpenChange, patient }: RecordVitals
       return;
     }
 
+    if (!patient?.patient_id) {
+      toast({
+        title: "Error",
+        description: "Patient ID is missing. Cannot record vitals.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: "Vitals Recorded",
-      description: `Vital signs recorded for ${patient?.name} (${patient?.patientId})`
-    });
-    
-    setIsSubmitting(false);
-    onOpenChange(false);
-    
-    // Reset form
-    setVitals({
-      temperature: '',
-      bloodPressureSystolic: '',
-      bloodPressureDiastolic: '',
-      heartRate: '',
-      respiratoryRate: '',
-      oxygenSaturation: '',
-      weight: '',
-      height: '',
-      painLevel: '',
-      notes: ''
-    });
+    try {
+      // Create triage assessment with vitals
+      await api.createTriageAssessment({
+        patient_id: patient.patient_id,
+        queue_id: patient.id || undefined,
+        triage_level: vitals.painLevel ? Math.min(5, Math.max(1, Math.ceil(parseInt(vitals.painLevel) / 2))) : 3,
+        triage_category: 'less_urgent',
+        chief_complaint: vitals.notes || 'Vitals recorded',
+        temperature: vitals.temperature ? parseFloat(vitals.temperature) : null,
+        blood_pressure_systolic: vitals.bloodPressureSystolic ? parseInt(vitals.bloodPressureSystolic) : null,
+        blood_pressure_diastolic: vitals.bloodPressureDiastolic ? parseInt(vitals.bloodPressureDiastolic) : null,
+        pulse_rate: vitals.heartRate ? parseInt(vitals.heartRate) : null,
+        respiratory_rate: vitals.respiratoryRate ? parseInt(vitals.respiratoryRate) : null,
+        oxygen_saturation: vitals.oxygenSaturation ? parseFloat(vitals.oxygenSaturation) : null,
+        weight: vitals.weight ? parseFloat(vitals.weight) : null,
+        height: vitals.height ? parseFloat(vitals.height) : null,
+        pain_level: vitals.painLevel ? parseInt(vitals.painLevel) : null,
+        notes: vitals.notes || null
+      });
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['triage'] });
+      queryClient.invalidateQueries({ queryKey: ['queue'] });
+      
+      toast({
+        title: "Vitals Recorded",
+        description: `Vital signs recorded for ${patient?.name} (${patient?.patientId})`
+      });
+      
+      onOpenChange(false);
+      
+      // Reset form
+      setVitals({
+        temperature: '',
+        bloodPressureSystolic: '',
+        bloodPressureDiastolic: '',
+        heartRate: '',
+        respiratoryRate: '',
+        oxygenSaturation: '',
+        weight: '',
+        height: '',
+        painLevel: '',
+        notes: ''
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to record vitals",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!patient) return null;
